@@ -1,12 +1,7 @@
-from datetime import date
-from email.policy import default
-from pyexpat import model
-from allauth.account.forms import SignupForm
-from django.contrib.admin.widgets import AdminDateWidget
 from django import forms
-from . models import MyUser
- 
- 
+
+from allauth.account.forms import SignupForm 
+from . models import MyUser 
 class MySignupForm(SignupForm):
     genderchoices = [
         ("M", "Male"),
@@ -23,7 +18,7 @@ class MySignupForm(SignupForm):
     
     def save(self, request):
          
-        user = super(MySignupForm, self).save(request)
+        user = super().save(request)
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']

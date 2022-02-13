@@ -1,11 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, full_name=None, email=None, gender=None, address=None, password=None):
+    def create_user(self, full_name=None,date_of_birth = None, email=None, gender=None,
+                    address=None, password=None):
 
         if not email:
             raise ValueError('Users must have an email address attached ')
@@ -13,6 +12,7 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             full_name=full_name,
+            date_of_birth = date_of_birth,
             gender=gender,
             address=address,
         )
@@ -23,7 +23,8 @@ class MyUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self,  full_name = None, date_of_birth = None, email= None, gender=None, address=None, password=None):
+    def create_superuser(self,  full_name=None, date_of_birth=None, email=None, gender=None,
+                         address=None, password=None):
 
         user = self.create_user(
             email=email,
@@ -31,6 +32,7 @@ class MyUserManager(BaseUserManager):
             full_name=full_name,
             gender=gender,
             address=address,
+            date_of_birth=date_of_birth
         )
         user.is_admin = True
         user.is_staff = True
@@ -65,17 +67,14 @@ class MyUser(AbstractBaseUser):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
+        
         return True
 
     def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
+        
         return True
 
     @property
     def is_sstaff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
+        
         return self.is_admin
