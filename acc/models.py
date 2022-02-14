@@ -3,8 +3,8 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, full_name=None,date_of_birth = None, email=None, gender=None,
-                    address=None, password=None):
+    def create_user(self, full_name=None, date_of_birth=None, email=None, gender=None,
+                    address=None, is_shop_user=False, password=None):
 
         if not email:
             raise ValueError('Users must have an email address attached ')
@@ -12,9 +12,10 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             full_name=full_name,
-            date_of_birth = date_of_birth,
+            date_of_birth=date_of_birth,
             gender=gender,
             address=address,
+            is_shop_user=is_shop_user
         )
         user.is_active = True
         user.is_staff = False
@@ -23,7 +24,7 @@ class MyUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self,  full_name=None, date_of_birth=None, email=None, gender=None,
+    def create_superuser(self,  full_name=None, date_of_birth=None,is_shop_user = False ,  email=None, gender=None,
                          address=None, password=None):
 
         user = self.create_user(
@@ -36,6 +37,7 @@ class MyUserManager(BaseUserManager):
         )
         user.is_admin = True
         user.is_staff = True
+        user.is_shop_user = False
         user.save()
         return user
 
@@ -57,6 +59,7 @@ class MyUser(AbstractBaseUser):
     address = models.CharField(max_length=200, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_shop_user = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     objects = MyUserManager()
 
@@ -67,14 +70,18 @@ class MyUser(AbstractBaseUser):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        
+
         return True
 
     def has_module_perms(self, app_label):
-        
+
         return True
 
     @property
     def is_sstaff(self):
-        
+
         return self.is_admin
+
+    def is_shopU(self):
+
+        return self.is_shop_user

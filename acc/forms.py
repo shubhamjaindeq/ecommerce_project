@@ -1,6 +1,6 @@
 from django import forms
 
-from allauth.account.forms import SignupForm 
+from allauth.account.forms import SignupForm
 from . models import MyUser 
 class MySignupForm(SignupForm):
     genderchoices = [
@@ -25,3 +25,4 @@ class MySignupForm(SignupForm):
         user.date_of_birth = self.cleaned_data['date_of_birth']
         user.save()
         return user
+
