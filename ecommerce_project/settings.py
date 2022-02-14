@@ -53,12 +53,12 @@ INSTALLED_APPS = [
 SITE_ID = 1
 SOCIALACCOUNT_PROVIDERS = {}
 AUTHENTICATION_BACKENDS = [
-    
+
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-    
+
 ]
-AUTH_USER_MODEL = 'acc.Myuser'  
+AUTH_USER_MODEL = 'acc.Myuser'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
@@ -73,10 +73,11 @@ EMAIL_HOST_USER = env('HOST_USER')
 EMAIL_HOST_PASSWORD = env('HOST_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
-REGISTRATION_ADMINS  = ['shujain@deqode.com',]
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+REGISTRATION_ADMINS = ['shujain@deqode.com', ]
 ACCOUNT_FORMS = {
-'signup': 'acc.forms.MySignupForm',
+    'signup': 'acc.forms.MySignupForm',
+    'login' : 'acc.forms.MyLoginForm',
 }
 REGISTRATION_FORM = 'acc.forms.CustomForm'
 
@@ -95,7 +96,7 @@ ROOT_URLCONF = 'ecommerce_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,8 +120,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': env('DATABASE_NAME'),
-        'HOST': env('DATABASE_HOST'), 
-        'USER': env('DATABASE_USER') ,
+        'HOST': env('DATABASE_HOST'),
+        'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASS'),
         'PORT': ""
     }
@@ -160,7 +161,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-#breakpoint()
+# breakpoint()
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
