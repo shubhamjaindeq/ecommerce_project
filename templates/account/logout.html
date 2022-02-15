@@ -1,31 +1,21 @@
-{% extends "./baseauth.html" %}
-{% block content %}
 
-<h4 class="text-dark mb-5">Sign Up</h4>
-<form action="/index.html">
-  <div class="row">
-    <div class="form-group col-md-12 mb-4">
-      <input type="email" class="form-control input-lg" id="email" aria-describedby="emailHelp" placeholder="Username">
-    </div>
-    <div class="form-group col-md-12 ">
-      <input type="password" class="form-control input-lg" id="password" placeholder="Password">
-    </div>
-    <div class="col-md-12">
-      <div class="d-flex my-2 justify-content-between">
-        <div class="d-inline-block mr-3">
-          <label class="control control-checkbox">Remember me
-            <input type="checkbox" />
-            <div class="control-indicator"></div>
-          </label>
-  
-        </div>
-        <p><a class="text-blue" href="#">Forgot Your Password?</a></p>
-      </div>
-      <button type="submit" class="btn btn-lg btn-primary btn-block mb-4">Sign In</button>
-      <p>Don't have an account yet ?
-        <a class="text-blue" href="sign-up.html">Sign Up</a>
-      </p>
-    </div>
-  </div>
+{% extends "./baseauth.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign Out" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Sign Out" %}</h1>
+<br>
+<p>{% trans 'Are you sure you want to sign out?' %}</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+  {% csrf_token %}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+  {% endif %}
+  <br>
+  <button type="submit" class ="btn btn-primary btn-default"  >{% trans 'Sign Out' %}</button>
 </form>
 {% endblock %}

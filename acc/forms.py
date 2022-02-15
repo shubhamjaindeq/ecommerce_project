@@ -1,12 +1,18 @@
 
 from django import forms
 
-from allauth.account.forms import SignupForm , LoginForm
+from allauth.account.forms import SignupForm, LoginForm
 
 from . models import MyUser
 
 
 class MySignupForm(SignupForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
+        self.fields['password1'].widget = forms.TextInput(attrs={'class': "form-control input-lg" , 'placeholder': "sldhk" })
+        self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
+        print(self)
     genderchoices = [
         ("M", "Male"),
         ("F", "Female")
@@ -16,10 +22,14 @@ class MySignupForm(SignupForm):
             'class': 'form-control input-lg',
             'placeholder': 'full_name'
         }))
-    address = forms.CharField(max_length=30, label='address',)
+    address = forms.CharField(max_length=30, label='address',widget=forms.TextInput(
+        attrs={
+            'class': 'form-control input-lg',
+            'placeholder': 'full_name'
+        }))
     date_of_birth = forms.DateField(
         label='date_of_birth', widget=forms.SelectDateWidget,)
-    gender = forms.ChoiceField(choices=genderchoices)
+    gender = forms.ChoiceField(choices=genderchoices )
 
     class Meta:
         model = MyUser
@@ -35,19 +45,11 @@ class MySignupForm(SignupForm):
         return user
 
 
-
 class MyLoginForm(LoginForm):
-    
-    email = LoginForm.email
-    email.attrs = {
-            'class': 'form-control input-lg',
-            'placeholder': 'full_name'
 
-    }
-   
-
-    class Meta:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['login'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
+        self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
+    class Meta: 
         model = MyUser
-
-    
-
