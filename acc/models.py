@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.shortcuts import get_object_or_404,HttpResponseRedirect
 
-from acc.forms import EditForm
 
 class MyUserManager(BaseUserManager):
     def create_user(self, full_name=None, date_of_birth=None, email=None, gender=None,
@@ -87,16 +86,3 @@ class MyUser(AbstractBaseUser):
     def is_shopU(self):
 
         return self.is_shop_user
-
-def update_view(request, id):
-   
-    context ={}
-    obj = get_object_or_404(Myuser, id = id)
- 
-    
-    form = EditForm(request.POST or None, instance = obj)
- 
-    
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect("/"+id)

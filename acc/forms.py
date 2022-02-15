@@ -3,7 +3,7 @@ from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
 
-from . models import MyUser
+from .models import MyUser
 
 
 class MySignupForm(SignupForm):
@@ -12,7 +12,7 @@ class MySignupForm(SignupForm):
         self.fields['email'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
         self.fields['password1'].widget = forms.TextInput(attrs={'class': "form-control input-lg" , 'placeholder': "sldhk" })
         self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
-        print(self)
+        #print(self)
     genderchoices = [
         ("M", "Male"),
         ("F", "Female")
@@ -54,10 +54,19 @@ class MyLoginForm(LoginForm):
     class Meta: 
         model = MyUser
 
-class EditForm(forms.Form):
-    def __init__(self,*args,**kwargs):
-        email = forms.EmailField(label = "email" , widget=forms.TextInput(
-            attrs={
-            'class': 'form-control',
-            'placeholder': 'email'
-        }) )
+class EditForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
+        self.fields['full_name'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
+        self.fields['address'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
+        
+    class Meta:
+            model = MyUser
+            fields = [
+            "email",
+            "full_name",
+            "address",
+            ]
+            
+            
