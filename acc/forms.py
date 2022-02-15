@@ -53,3 +53,11 @@ class MyLoginForm(LoginForm):
         self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
     class Meta: 
         model = MyUser
+
+class EditForm(forms.Form):
+    def __init__(self,*args,**kwargs):
+        email = forms.EmailField(label = "email" , widget=forms.TextInput(
+            attrs={
+            'class': 'form-control',
+            'placeholder': 'email'
+        }) )
