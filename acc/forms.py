@@ -2,7 +2,7 @@
 from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
-
+from django.db.models.signals import post_save
 from .models import MyUser
 
 
@@ -29,22 +29,28 @@ class MySignupForm(SignupForm):
             'placeholder': 'full_name'
         }))
 
-    role = forms.CharField(max_length=10 , widget=forms.TextInput(
-        attrs={
-            
-            'type' : "hidden",
-        }))
+    role = forms.ChoiceField(choices=roles)
     date_of_birth = forms.DateField(
         label='date_of_birth', widget=forms.SelectDateWidget,)
     gender = forms.ChoiceField(choices=genderchoices )
-    role = forms.ChoiceField(choices=roles)
+    
 
     class Meta:
         model = MyUser
 
     def save(self, request):
-
-        user = super().save(request)
+        # post_save.disconnect(MyUser)
+        #user = super().save(request )
+        # post_save.connect(MyUser)
+        user = MyUser()
+        a = self.cleaned_data['role']
+        if a == "shopowner":
+            user.is_active = False
+        user.email = self.cleaned_data['email'] 
+        user.password = self.cleaned_data['password2']
+        print("password is",user.password)
+        user.role = self.cleaned_data['role']
+        print(user.role , "is after first save is called")
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']

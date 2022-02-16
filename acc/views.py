@@ -36,3 +36,4 @@ def update_view(request):
             return render(request , 'profile.html')
    
     return render(request , 'editprofile.html' , {'form' : form })
+

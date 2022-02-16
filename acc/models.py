@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.shortcuts import get_object_or_404,HttpResponseRedirect
+from django.contrib.auth.hashers import make_password
 
 
 class MyUserManager(BaseUserManager):
@@ -18,7 +19,12 @@ class MyUserManager(BaseUserManager):
             gender=gender,
             address=address,
             role = role
+
+            
         )
+        print(password,"at manager")
+        user.set_password(password)
+
         user.is_active = True
         user.is_staff = False
         user.is_admin = False
@@ -55,6 +61,7 @@ class MyUser(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
+    #password = models.CharField(max_length=50)
 
     full_name = models.CharField(max_length=200, null=True)
     date_of_birth = models.DateField(null=True)
@@ -62,7 +69,7 @@ class MyUser(AbstractBaseUser):
     address = models.CharField(max_length=200, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    role = models.CharField(max_length=10 , choices=roles, default="customer")
+    role = models.CharField(max_length=10 , choices=roles)
     is_staff = models.BooleanField(default=False)
     objects = MyUserManager()
 
@@ -71,6 +78,15 @@ class MyUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+    def passchange(self,a):
+        self.set_password(a)
+        self.save()
+
+    def changeactive(self,abcd):
+        self.is_active = False
+        print("called changeactiive")
+        self .save()
 
     def has_perm(self, perm, obj=None):
 
@@ -85,9 +101,7 @@ class MyUser(AbstractBaseUser):
 
         return self.is_admin
 
-    def is_shopU(self):
-
-        return self.is_shop_user
+   
 
 class Shop(models.Model):
     name = models.CharField(max_length=50)
