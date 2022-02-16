@@ -4,7 +4,7 @@ from django.urls import path,include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    # path('registration/',include('registration.backends.admin_approval.urls')),
+    #path('accounts/signupshop', views.signupasshop , ),
     path('acc/',include('acc.urls')),
 
 ]

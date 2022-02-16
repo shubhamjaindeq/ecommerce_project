@@ -18,7 +18,8 @@
                     </div>
                 </div>
             </div>
-            <form class="login" method="POST" action="{% url 'update_view' %}"></form>
+            <form class="login" method="POST" action="{% url 'update_view' %}">
+                {% csrf_token %}
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">

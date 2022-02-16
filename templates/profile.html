@@ -22,7 +22,7 @@
                       <h4>John Doe</h4>
                       <br>
                       <p class="text-secondary mb-1">User Role</p>
-                      <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
+                      <p class="text-muted font-size-sm">{{ user.address }}</p>
                       
                     </div>
                   </div>
@@ -61,7 +61,7 @@
                       <h6 class="mb-0">Full Name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {{ user.full_name }}
                     </div>
                   </div>
                   <hr>
@@ -70,34 +70,17 @@
                       <h6 class="mb-0">Email</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      fip@jukmuh.al
+                      {{ user.email }}
                     </div>
                   </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Phone</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      (239) 816-9029
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Mobile</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      (320) 380-4539
-                    </div>
-                  </div>
+                  
                   <hr>
                   <div class="row">
                     <div class="col-sm-3">
                       <h6 class="mb-0">Address</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      Bay Area, San Francisco, CA
+                      {{ user.address }}
                     </div>
                   </div>
                   <hr>

@@ -4,8 +4,9 @@ from django.shortcuts import get_object_or_404,HttpResponseRedirect
 
 
 class MyUserManager(BaseUserManager):
+
     def create_user(self, full_name=None, date_of_birth=None, email=None, gender=None,
-                    address=None, is_shop_user=False, password=None):
+                    address=None, is_shop_user=False,role = "customer", password=None):
 
         if not email:
             raise ValueError('Users must have an email address attached ')
@@ -16,7 +17,7 @@ class MyUserManager(BaseUserManager):
             date_of_birth=date_of_birth,
             gender=gender,
             address=address,
-            is_shop_user=is_shop_user
+            role = role
         )
         user.is_active = True
         user.is_staff = False
@@ -38,12 +39,13 @@ class MyUserManager(BaseUserManager):
         )
         user.is_admin = True
         user.is_staff = True
-        user.is_shop_user = False
+        user.role = "admin"
         user.save()
         return user
 
 
 class MyUser(AbstractBaseUser):
+    roles = [('admin','admin') , ('shopowner','shopowner') ,('customer','customer')]
     genderchoices = [
         ("M", "Male"),
         ("F", "Female")
@@ -60,7 +62,7 @@ class MyUser(AbstractBaseUser):
     address = models.CharField(max_length=200, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    is_shop_user = models.BooleanField(default=False)
+    role = models.CharField(max_length=10 , choices=roles, default="customer")
     is_staff = models.BooleanField(default=False)
     objects = MyUserManager()
 
@@ -86,3 +88,9 @@ class MyUser(AbstractBaseUser):
     def is_shopU(self):
 
         return self.is_shop_user
+
+class Shop(models.Model):
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=200)
+    description = models.CharField(max_length=500)
+

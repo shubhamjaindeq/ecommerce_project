@@ -17,6 +17,7 @@ class MySignupForm(SignupForm):
         ("M", "Male"),
         ("F", "Female")
     ]
+    roles = [("admin", "admin") , ("shopowner", "shopowner") ,("customer","customer")]
     full_name = forms.CharField(max_length=30, label='full_name', widget=forms.TextInput(
         attrs={
             'class': 'form-control input-lg',
@@ -27,9 +28,16 @@ class MySignupForm(SignupForm):
             'class': 'form-control input-lg',
             'placeholder': 'full_name'
         }))
+
+    role = forms.CharField(max_length=10 , widget=forms.TextInput(
+        attrs={
+            
+            'type' : "hidden",
+        }))
     date_of_birth = forms.DateField(
         label='date_of_birth', widget=forms.SelectDateWidget,)
     gender = forms.ChoiceField(choices=genderchoices )
+    role = forms.ChoiceField(choices=roles)
 
     class Meta:
         model = MyUser
@@ -69,4 +77,4 @@ class EditForm(forms.ModelForm):
             "address",
             ]
             
-            
+    

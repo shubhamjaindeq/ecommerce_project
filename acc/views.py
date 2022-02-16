@@ -1,3 +1,4 @@
+from audioop import reverse
 from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404,HttpResponseRedirect
 from .forms import EditForm, MyLoginForm
@@ -8,8 +9,13 @@ def index(request):
     return render(request, 'blankbody.html')
 
 def profile(request):
-
-    return render(request , 'profile.html')
+    if request.user.is_authenticated:
+        current_user = request.user
+        print(current_user.full_name)
+        context = {'user' : current_user}
+        return render(request , 'profile.html')
+    else:
+        return HttpResponseRedirect('/accounts/login')
 
 def editdetails(request):
     form = EditForm()
@@ -20,18 +26,13 @@ def update_view(request):
     print("front")
     id = current_user.id
     print(id)
-    print("break")
     context ={}
     obj = get_object_or_404(MyUser, id = id)
- 
-    print(obj)
     form  = MyLoginForm()
-    print(form)
     form = EditForm(request.POST or None, instance = obj)
-    print(form)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect("running")
-    print(form)
+            return render(request , 'profile.html')
+   
     return render(request , 'editprofile.html' , {'form' : form })
