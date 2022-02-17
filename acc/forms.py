@@ -39,18 +39,14 @@ class MySignupForm(SignupForm):
         model = MyUser
 
     def save(self, request):
-        # post_save.disconnect(MyUser)
-        #user = super().save(request )
-        # post_save.connect(MyUser)
         user = MyUser()
         a = self.cleaned_data['role']
         if a == "shopowner":
             user.is_active = False
         user.email = self.cleaned_data['email'] 
         user.password = self.cleaned_data['password2']
-        print("password is",user.password)
+        
         user.role = self.cleaned_data['role']
-        print(user.role , "is after first save is called")
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']
@@ -83,4 +79,11 @@ class EditForm(forms.ModelForm):
             "address",
             ]
             
+    
+class AdminAppForm(forms.Form):
+    choices = [
+        ("approve" , "approve"),
+        ("reject" , "reject")
+    ]
+    status = forms.ChoiceField(choices=choices)
     

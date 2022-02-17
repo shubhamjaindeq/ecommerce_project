@@ -1,17 +1,38 @@
-from audioop import reverse
+
 from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404,HttpResponseRedirect
-from .forms import EditForm, MyLoginForm
+
 from .models import MyUser
+from .forms import EditForm, MyLoginForm , AdminAppForm
+
 
 # Create your views here.
 def index(request):
     return render(request, 'blankbody.html')
 
+def approval(request,id = None):
+    if request.method == "POST":
+        form = AdminAppForm(request.POST)
+        ans = form['status'].value()
+        if ans == "approve":
+            id = request.POST['id']
+            MyUser.objects.filter(id = id).update(is_active = True)
+        else:
+            print("Rejected")
+        return HttpResponse("okay")
+
+        
+        
+    
+    else:
+        form = AdminAppForm()
+        return render(request , 'approval.html' , {'form' : form , 'id' : id})
+
+
+
 def profile(request):
     if request.user.is_authenticated:
         current_user = request.user
-        print(current_user.full_name)
         context = {'user' : current_user}
         return render(request , 'profile.html')
     else:
@@ -23,9 +44,8 @@ def editdetails(request):
 
 def update_view(request):
     current_user = request.user
-    print("front")
     id = current_user.id
-    print(id)
+    
     context ={}
     obj = get_object_or_404(MyUser, id = id)
     form  = MyLoginForm()

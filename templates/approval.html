@@ -1,3 +1,8 @@
-<html>
-    <a href="http://localhost:8000/acc/profile/" > click this to approve</a>
-</html>
+
+<form action="/acc/approval" , method="POST" >
+    {% csrf_token %}
+{{ form }}
+<input  type = "hidden" name="id" value={{ id }} >
+<input type = "submit" >
+
+</form>
