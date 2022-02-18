@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 class MyUserManager(BaseUserManager):
 
     def create_user(self, full_name=None, date_of_birth=None, email=None, gender=None,
-                    address=None, is_shop_user=False,role = "customer", password=None):
+                    address=None, role = "customer", password=None):
 
         if not email:
             raise ValueError('Users must have an email address attached ')
@@ -22,7 +22,6 @@ class MyUserManager(BaseUserManager):
 
             
         )
-        print(password,"at manager")
         user.set_password(password)
 
         user.is_active = True
@@ -83,10 +82,7 @@ class MyUser(AbstractBaseUser):
         self.set_password(a)
         self.save()
 
-    def changeactive(self,abcd):
-        self.is_active = False
-        print("called changeactiive")
-        self .save()
+    
 
     def has_perm(self, perm, obj=None):
 
@@ -97,7 +93,7 @@ class MyUser(AbstractBaseUser):
         return True
 
     @property
-    def is_sstaff(self):
+    def is_staff_user(self):
 
         return self.is_admin
 

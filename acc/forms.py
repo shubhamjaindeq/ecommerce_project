@@ -1,4 +1,3 @@
-
 from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
@@ -41,11 +40,9 @@ class MySignupForm(SignupForm):
     def save(self, request):
         user = MyUser()
         a = self.cleaned_data['role']
-        if a == "shopowner":
-            user.is_active = False
         user.email = self.cleaned_data['email'] 
         user.password = self.cleaned_data['password2']
-        
+        user.set_password(user.password)
         user.role = self.cleaned_data['role']
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
@@ -81,9 +78,17 @@ class EditForm(forms.ModelForm):
             
     
 class AdminAppForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
     choices = [
         ("approve" , "approve"),
         ("reject" , "reject")
     ]
-    status = forms.ChoiceField(choices=choices)
     
+    class Meta:
+        model = MyUser
+        fields = []
+
+    response = forms.ChoiceField(choices=choices)
+

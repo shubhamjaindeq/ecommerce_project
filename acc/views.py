@@ -1,5 +1,13 @@
 
+from pipes import Template
+from re import template
+from urllib import request
 from django.http import HttpResponse
+from django.views.generic.list import ListView
+from django.views.generic.edit import UpdateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.detail import DetailView
+from django.views.generic.base import TemplateView
 from django.shortcuts import render,get_object_or_404,HttpResponseRedirect
 
 from .models import MyUser
@@ -7,54 +15,85 @@ from .forms import EditForm, MyLoginForm , AdminAppForm
 
 
 # Create your views here.
-def index(request):
-    return render(request, 'blankbody.html')
+class IndexView(TemplateView):
 
-def approval(request,id = None):
-    if request.method == "POST":
-        form = AdminAppForm(request.POST)
-        ans = form['status'].value()
-        if ans == "approve":
-            id = request.POST['id']
-            MyUser.objects.filter(id = id).update(is_active = True)
-        else:
-            print("Rejected")
-        return HttpResponse("okay")
+    template_name = "blankbody.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
 
-        
-        
-    
-    else:
+class ApprovalView(TemplateView):
+
+    template_name = 'approval.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        id = self.kwargs['id']
+
+        user = MyUser.objects.get(id=id)
+        context['user'] = user
         form = AdminAppForm()
-        return render(request , 'approval.html' , {'form' : form , 'id' : id})
-
-
-
-def profile(request):
-    if request.user.is_authenticated:
-        current_user = request.user
-        context = {'user' : current_user}
-        return render(request , 'profile.html')
-    else:
-        return HttpResponseRedirect('/accounts/login')
-
-def editdetails(request):
-    form = EditForm()
-    return render(request, 'editprofile.html' , {'form' : form})
-
-def update_view(request):
-    current_user = request.user
-    id = current_user.id
+        context['form'] = form
+        return context
     
-    context ={}
-    obj = get_object_or_404(MyUser, id = id)
-    form  = MyLoginForm()
-    form = EditForm(request.POST or None, instance = obj)
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            return render(request , 'profile.html')
-   
-    return render(request , 'editprofile.html' , {'form' : form })
+
+
+
+
+
+class RejectView(DeleteView):
+    model = MyUser
+    success_url = '/acc'
+    template_name = 'comfirmdelete.html'
+    form_class = AdminAppForm
+    def form_valid(self, form):
+        print(form['response'].value(), "is response")
+        
+        success_url = self.get_success_url()
+        if form['response'].value() == "reject":
+            self.object.delete()
+            return HttpResponse(success_url)
+        else:
+            intended_user = MyUser.objects.get(id = self.kwargs['pk'])
+            intended_user.is_active = True
+            intended_user.save()
+            print(self.kwargs)
+            return HttpResponseRedirect(success_url)
+
+
+class ProfileView(DetailView):
+    model = MyUser
+    template_name = 'profile.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(self.request.user)
+        context['user'] = self.request.user
+        print(context)
+        return context
+
+class AllReqView(ListView):
+    model = MyUser
+    template_name = "myuser_list.html"
+    def get_queryset(self):
+        return MyUser.objects.filter(is_active = False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lst'] = MyUser.objects.filter(is_active = False)
+        return context
+            
+class MyUserUpdateView(UpdateView):
+    model = MyUser
+    template_name = 'editprofile.html'
+    fields = [
+        "full_name",
+        "address",
+        "date_of_birth",
+        "email",
+    ]
+  
+    
+    success_url ="/acc"
 

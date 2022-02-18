@@ -1,8 +1,90 @@
+{% extends "blankbody.html" %}
+{% block content %}
+<html>
+    <head>
+        <title>User Profile </title>
+    </head>
+<div class="container">
+    <div class="main-body">
+    
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb" class="main-breadcrumb">
+         
+          </nav>
+          <!-- /Breadcrumb -->
+    
+          <div class="row gutters-sm">
+ 
+              
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Full Name</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.full_name }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Email</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.email }}
+                    </div>
+                  </div>
+                  
+                  
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Gender</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.gender }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">D.O.B</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.date_of_birth }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Address</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.address }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form action = "/acc/reject/{{user.id}}" method="POST" >  
+                        {% csrf_token %}
+                        
+                        {{ form }}
+                        <input type="submit" >
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-<form action="/acc/approval" , method="POST" >
-    {% csrf_token %}
-{{ form }}
-<input  type = "hidden" name="id" value={{ id }} >
-<input type = "submit" >
 
-</form>
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+</html>
