@@ -1,4 +1,4 @@
-{% extends "blankbody.html" %}
+{% extends "shop/shopblankbody.html" %}
 {% block content %}
 <html>
     <head>
@@ -80,6 +80,7 @@
                   <div class="row">
                     <div class="col-sm-3">
                       <h6 class="mb-0">Address</h6>
+                    
                     </div>
                     <div class="col-sm-9 text-secondary">
                       {{ user.address }}
@@ -87,8 +88,35 @@
                   </div>
                   <hr>
                   <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Shop Name</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.shopname }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Shop Address</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.shopaddress }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Shop Description</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ user.shopdesc }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
                     <div class="col-sm-12">
-                      <a class="btn btn-info " target="__blank" href="/acc/editdetails/{{user.id}}">Edit details</a>
+                      <a class="btn btn-info " target="__blank" href="/editshopdetails/{{user.id}}">Edit details</a>
                     </div>
                   </div>
                 </div>

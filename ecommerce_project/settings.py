@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,26 +43,22 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'acc',
-
-
 ]
 
 SITE_ID = 1
 SOCIALACCOUNT_PROVIDERS = {}
 AUTHENTICATION_BACKENDS = [
-
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-
 ]
-AUTH_USER_MODEL = 'acc.Myuser'
+AUTH_USER_MODEL = 'acc.User'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_LOGOUT_REDIRECT_URL ="/accounts/login"
 ACCOUNT_AUTHENTICATION_METHOD = ("email")
 ACCOUNT_EMAIL_VERIFICATION = ("mandatory")
-LOGIN_REDIRECT_URL = '/acc/'
+LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 EMAIL_HOST = 'smtp.gmail.com'
@@ -75,11 +70,10 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 REGISTRATION_ADMINS = ['shujain@deqode.com', ]
 ACCOUNT_FORMS = {
-    'signup': 'acc.forms.MySignupForm',
-    'login' : 'acc.forms.MyLoginForm',
+    'signup': 'acc.forms.CustomerSignupForm',
+    'login' : 'acc.forms.UserLoginForm',
 }
 REGISTRATION_FORM = 'acc.forms.CustomForm'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

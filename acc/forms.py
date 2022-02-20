@@ -1,49 +1,36 @@
+"""module defines all the form used all ove the project"""
 from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
-from django.db.models.signals import post_save
-from .models import MyUser
+
+from .models import User
 
 
-class MySignupForm(SignupForm):
+class CustomerSignupForm(SignupForm):
+    """form for customer to sign up"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['email'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
-        self.fields['password1'].widget = forms.TextInput(attrs={'class': "form-control input-lg" , 'placeholder': "sldhk" })
-        self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
-        #print(self)
+
     genderchoices = [
         ("M", "Male"),
         ("F", "Female")
     ]
-    roles = [("admin", "admin") , ("shopowner", "shopowner") ,("customer","customer")]
-    full_name = forms.CharField(max_length=30, label='full_name', widget=forms.TextInput(
-        attrs={
-            'class': 'form-control input-lg',
-            'placeholder': 'full_name'
-        }))
-    address = forms.CharField(max_length=30, label='address',widget=forms.TextInput(
-        attrs={
-            'class': 'form-control input-lg',
-            'placeholder': 'full_name'
-        }))
 
-    role = forms.ChoiceField(choices=roles)
+    full_name = forms.CharField(max_length=50)
+    address = forms.CharField(max_length=100)
     date_of_birth = forms.DateField(
         label='date_of_birth', widget=forms.SelectDateWidget,)
-    gender = forms.ChoiceField(choices=genderchoices )
-    
+    gender = forms.ChoiceField(choices=genderchoices)
 
     class Meta:
-        model = MyUser
+        """meta attributes for this class"""
+        model = User
 
     def save(self, request):
-        user = MyUser()
-        a = self.cleaned_data['role']
-        user.email = self.cleaned_data['email'] 
-        user.password = self.cleaned_data['password2']
+        user = User()
+        user.role = "customer"
+        user.email = self.cleaned_data['email']
         user.set_password(user.password)
-        user.role = self.cleaned_data['role']
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']
@@ -52,43 +39,55 @@ class MySignupForm(SignupForm):
         return user
 
 
-class MyLoginForm(LoginForm):
+class ShopSignupForm(SignupForm):
+    """form for shop to sign up"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['login'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
-        self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'form-control input-lg'})
-    class Meta: 
-        model = MyUser
 
-class EditForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['email'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
-        self.fields['full_name'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
-        self.fields['address'].widget = forms.TextInput(attrs={'class': "form-control input-lg"})
-        
-    class Meta:
-            model = MyUser
-            fields = [
-            "email",
-            "full_name",
-            "address",
-            ]
-            
-    
-class AdminAppForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    choices = [
-        ("approve" , "approve"),
-        ("reject" , "reject")
+    genderchoices = [
+        ("M", "Male"),
+        ("F", "Female")
     ]
-    
+    full_name = forms.CharField(max_length=50)
+    address = forms.CharField(max_length=100)
+    date_of_birth = forms.DateField(
+        label='date_of_birth', widget=forms.SelectDateWidget,)
+    gender = forms.ChoiceField(choices=genderchoices)
+    shopname = forms.CharField(max_length=50)
+    shopaddress = forms.CharField(max_length=200)
+    shopdesc = forms.CharField(max_length=500)
+    role = "shopowner"
+
     class Meta:
-        model = MyUser
+        """meta attribute for this class"""
+        model = User
+
+
+class UserLoginForm(LoginForm):
+    """form for user login"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        """meta attribtes"""
+        model = User
+
+
+class RequestResponseForm(forms.Form):
+    """Form for aadmin to approve or reject a shop registration"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+    choices = [
+        ("approve", "approve"),
+        ("reject", "reject")
+    ]
+
+    class Meta:
+        """meta attribute for this class"""
+        model = User
         fields = []
 
     response = forms.ChoiceField(choices=choices)
-

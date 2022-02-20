@@ -1,5 +1,6 @@
 {% extends "./baseauth.html" %}
 {% load i18n %}
+{% load myfilters %}
 {% load account socialaccount %}
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
@@ -34,10 +35,10 @@ for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
 
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
+
+  {{form.login|addclass:'form-control input-lg'}}
+  <hr>
+  {{form.password|addclass:'form-control input-lg'}}
   <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
   <button class="btn btn-primary btn-default" type="submit">{% trans "Sign In" %}</button>
 </form>

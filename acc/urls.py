@@ -1,18 +1,17 @@
+"""urls mapping for acc app file"""
 from django.urls import path
 
-from acc.views import ApprovalView, IndexView, ProfileView ,MyUserUpdateView , RejectView
-from . import views
+from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, \
+     ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView
 
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
-    path('approval/<int:id>',ApprovalView.as_view(),name='approval'),
-    path('profile/<int:pk>', ProfileView.as_view() , name ='profile'),
-    path('editdetails/<int:pk>' , MyUserUpdateView.as_view() , name ='update_view'),
-    path('reject/<int:pk>', RejectView.as_view(), name = "reject" ),
-    #path('approval/' ,ApprovalResultView.as_view(), name="postapproval"),
-    
-    #path('approval/response/<int:id>',App)
-    path('requests' , views.AllReqView.as_view() , name = "getallrequests")
-
+    path('approval/<int:id>', ApprovalView.as_view(), name='approval'),
+    path('userprofile/<int:pk>', UserProfileView.as_view(), name='profile'),
+    path('shopprofile/<int:pk>', ShopProfileView.as_view(), name='shopprofile'),
+    path('editshopdetails/<int:pk>',ShopUpdateView.as_view(), name='shopupdate_view'),
+    path('edituserdetails/<int:pk>',UserUpdateView.as_view(), name='userupdate_view'),
+    path('signupasshop/', ShopSignupFormView.as_view(), name="shopsignup"),
+    path('requests', RequestsView.as_view(), name="getallrequests"),
 ]
