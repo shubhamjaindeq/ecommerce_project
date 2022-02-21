@@ -10,7 +10,7 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import User
-from .forms import RequestResponseForm, ShopSignupForm , AddUserForm
+from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm
 
 
 class IndexView(TemplateView):
@@ -151,6 +151,21 @@ class UserUpdateView(UpdateView):
         "email",
     ]
     success_url ="/"
+
+class UserUpdateByAdminView(UpdateView):
+
+    form_class = AdminUserUpdateForm
+
+    def get(self, request , *args , **kwargs):
+        print("user update by admin clalled")
+        breakpoint()
+        """gets called if the request methods is get"""
+        user_id = self.kwargs['id']
+        request_by = User.objects.get(id=user_id)
+        form = self.form_class()
+        return render(request , self.template_name , {'form' : form  , 'request_by' : request_by })
+
+
 
 class ShopUpdateView(UpdateView):
     """Renders and updates shop details"""

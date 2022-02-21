@@ -6,6 +6,14 @@ from allauth.account.forms import SignupForm, LoginForm
 from .models import User
 
 
+class AdminUserUpdateForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    full_name = forms.CharField(max_length=50)
+
+
+
 class CustomerSignupForm(SignupForm):
     """form for customer to sign up"""
     def __init__(self, *args, **kwargs):

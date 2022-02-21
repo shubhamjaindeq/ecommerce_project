@@ -3,7 +3,7 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 
 from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, \
-     ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView , UserListView , AddUserFormView
+     ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView , UserListView , AddUserFormView , UserUpdateByAdminView
 
 
 urlpatterns = [
@@ -14,7 +14,8 @@ urlpatterns = [
     path('editshopdetails/<int:pk>',ShopUpdateView.as_view(), name='shopupdate_view'),
     path('edituserdetails/<int:pk>',UserUpdateView.as_view(), name='userupdate_view'),
     path('signupasshop/', ShopSignupFormView.as_view(), name="shopsignup"),
-    path('requests', RequestsView.as_view(), name="getallrequests"),
-    path('listusers', UserListView.as_view() , name = "userlist" ),
-    path('adduser' , AddUserFormView.as_view() , name = "adduser" )
+    path('requests/', RequestsView.as_view(), name="getallrequests"),
+    path('listusers/', UserListView.as_view() , name = "userlist" ),
+    path('adduser/' ,AddUserFormView.as_view() , name = "adduser" ),
+    path('userupdatebyadmin/<int:pk>', UserUpdateByAdminView.as_view() , name = "userupdatebyadmin"),
 ]

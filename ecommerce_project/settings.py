@@ -175,7 +175,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
-
+STATICFILES_FINDERS = (
+   'django.contrib.staticfiles.finders.FileSystemFinder',
+   'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+   'dajaxice.finders.DajaxiceFinder',
+)
+DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
