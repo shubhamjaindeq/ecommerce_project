@@ -1,5 +1,8 @@
 """program logic for the acc app"""
+from django.http import JsonResponse 
 from re import template
+import json
+from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
 from django.views.generic.list import ListView
@@ -152,18 +155,44 @@ class UserUpdateView(UpdateView):
     ]
     success_url ="/"
 
-class UserUpdateByAdminView(UpdateView):
+class UserUpdateByAdminView(View):
 
-    form_class = AdminUserUpdateForm
+    model = User
+    template_name = "updateuserbyadmin.html"
 
     def get(self, request , *args , **kwargs):
         print("user update by admin clalled")
-        breakpoint()
-        """gets called if the request methods is get"""
-        user_id = self.kwargs['id']
+        user_id = self.kwargs['pk']
+
         request_by = User.objects.get(id=user_id)
-        form = self.form_class()
-        return render(request , self.template_name , {'form' : form  , 'request_by' : request_by })
+        
+        responseData = {
+        'id': request_by.id,
+        'full_name': request_by.full_name,
+        'email': request_by.email,
+        'role' : request_by.role,
+        'address' : request_by.address,
+    }
+        
+        return JsonResponse(responseData)
+
+    def post(self , request , *args , **kwargs):
+        data = json.loads(request.POST.get('data', ''))
+        obj = data['obj']
+        id = obj['id']
+        address = obj['address']
+        full_name = obj['full_name']
+        role = obj['role']
+        email = obj['email']
+        request_by = User.objects.get(id=id)
+        request_by.address = address
+        request_by.full_name = full_name
+        request_by.role = role
+        request_by.email = email
+        request_by.save()
+
+        return HttpResponse("okay")
+        
 
 
 

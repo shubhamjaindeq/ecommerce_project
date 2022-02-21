@@ -4,7 +4,7 @@
 
 <table id = "myTable" width = "100%" > 
     <br>  
-<a href ="adduser" > <button class= "mb-1 btn  disabled btn-success" > Add user</button></a>
+<a href ="/adduser" > <button class= "mb-1 btn  disabled btn-success" > Add user</button></a>
 <br>
     <thead>
         
@@ -19,7 +19,8 @@
         
 
     </thead>
-    <tbody>
+    
+    <tbody  id = "myTbody">
         {% for obj in object_list %}
         <tr>
             <td>{{ obj.id }}</td>
@@ -29,47 +30,118 @@
             <td>{{ obj.gender }}</td>
             <td>{{ obj.role }}</td>
 
-            <td> <a href="/userupdatebyadmin/{{obj.id}}" id="id_update"  >update</a> </td>
+            <td  >   <button class="id_update" onclick="get_data('{{ obj.id }}')" > update </button>  </td>
             
             
             
             
         </tr>
         {% endfor %}
+        
+        
     </tbody>
+    
 </table>
+<div class="form-popup" id="myForm">
+    <form action="#" id="myForm" class="form-container">
+      <h1>Update</h1>
+  
+      <label for="email"><b>Email</b></label>
+      <input type="email" id = "form_email" placeholder="Enter Email" name="email" required>
+      <br>
+      <label for="email"><b>Email</b></label>
+      <input type="text" id ="form_id" placeholder="Enter Email" name="email" required>
+      <br>
+      <label for="psw"><b>Fullname</b></label>
+      <input type="text"  id="form_name" placeholder="Enter Password" name="psw" required>
+      <br>
+      <label for="psw"><b>address</b></label>
+      <input type="text" id="form_address" placeholder="Enter Password" name="psw" required>
+      <br>
+      <label for="psw"><b>role</b></label>
+      <input type="text"  id = form_role placeholder="Enter Password" name="psw" required>
+      <br>
+      <button type="button" class="btn" onclick="update()" >Update</button>
+      <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+</div>
+                                                
+<script>
+    document.getElementById("myForm").style.display = "None";
+    function get_data(e){
+        document.getElementById("myForm").style.display = "block";
+        document.getElementById("myTbody").style.display = "None";
+        //console.log(e)
+        $.ajax({
+            type: 'GET',
+            url: `/userupdatebyadmin/${e}`,
+            data: {"id": e},
+            success: function (response) {
+                // if not valid user, alert the user
+                document.getElementById("form_name").value = response.full_name;
+                document.getElementById("form_address").value = response.address;
+                document.getElementById("form_role").value = response.role;
+                document.getElementById("form_email").value = response.email;
+                document.getElementById("form_id").value = response.id;
+                
+                console.log(response)
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    }
+    function closeForm(e){
+        document.getElementById("myForm").style.display = "None";
+        document.getElementById("myTbody").style.display = "inherit";
+        //console.log(e)
+        $.ajax({
+            type: 'GET',
+            url: `/userupdatebyadmin/${e}`,
+            data: {"id": e},
+            success: function (response) {
+                // if not valid user, alert the user
+                console.log(response)
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    }
+    function update(e){
+        
+        console.log("in update")
+        formis = document.getElementById("myForm")
+        console.log(e)
+        updated_data = {
+        'address' : document.getElementById("form_address").value ,
+        'full_name': document.getElementById("form_name").value ,
+        'role' : document.getElementById("form_role").value ,
+        'email' : document.getElementById("form_email").value,
+        'id' : document.getElementById("form_id").value,
+        'data': {
+            'content': 'xxx',
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+    }
+    $.ajax({
+            type: 'POST',
+            url: '/userupdatebyadmin/',
+            data: {'data': JSON.stringify({'obj': updated_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function (response) {
+                // if not valid user, alert the user
+                console.log(response)
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+ 
+    }  
+</script>
 
 {% endblock %}
-<!-- {% block javascript %}
-<script>
-    /*
-    On focus out on input nickname,
-    call AJAX get request to check if the nickName
-    already exists or not.
-    */
-    $("#id_update").onClick(function (e) {
-        console.log("called")
-        // e.preventDefault();
-        // // get the nickname
-        // var nick_name = $(this).val();
-        // // GET AJAX request
-        // $.ajax({
-        //     type: 'GET',
-        //     url: "{% url 'validate_nickname' %}",
-        //     data: {"nick_name": nick_name},
-        //     success: function (response) {
-        //         // if not valid user, alert the user
-        //         if(!response["valid"]){
-        //             alert("You cannot create a friend with same nick name");
-        //             var nickName = $("#id_nick_name");
-        //             nickName.val("")
-        //             nickName.focus()
-        //         }
-        //     },
-        //     error: function (response) {
-        //         console.log(response)
-        //     }
-        // })
-    })
-</script>
-{% endblock javascript %} -->
+{% block javascript %}
+
+    {% endblock javascript %}
+

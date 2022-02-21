@@ -18,4 +18,5 @@ urlpatterns = [
     path('listusers/', UserListView.as_view() , name = "userlist" ),
     path('adduser/' ,AddUserFormView.as_view() , name = "adduser" ),
     path('userupdatebyadmin/<int:pk>', UserUpdateByAdminView.as_view() , name = "userupdatebyadmin"),
+    path('userupdatebyadmin/', UserUpdateByAdminView.as_view() , name = "userupdatebyadmin"),
 ]
