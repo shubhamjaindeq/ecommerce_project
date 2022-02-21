@@ -1,0 +1,41 @@
+{% extends 'baseblankbody.html' %}
+{% block content %}
+
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+<a href ="adduser" > <button class= "mb-1 btn  disabled btn-success" > Add user</button></a>
+<br>
+    <thead>
+        
+        <th>ID</th>
+        <th>Email</th>
+        <th>Full_name</th>
+        <th>Address</th>
+        <th>gender</th>
+        <th>Role</th>
+        <th>Update</th>
+        
+        
+
+    </thead>
+    <tbody>
+        {% for obj in object_list %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.email }}</td>
+            <td>{{ obj.full_name }}</td>
+            <td>{{ obj.address }}</td>
+            <td>{{ obj.gender }}</td>
+            <td>{{ obj.role }}</td>
+            <td> Update </td>
+            
+            
+            
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

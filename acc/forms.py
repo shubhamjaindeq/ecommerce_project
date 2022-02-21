@@ -64,6 +64,31 @@ class ShopSignupForm(SignupForm):
         model = User
 
 
+class AddUserForm(SignupForm):
+    """form for shop to sign up"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    genderchoices = [
+        ("M", "Male"),
+        ("F", "Female")
+    ]
+    full_name = forms.CharField(max_length=50)
+    address = forms.CharField(max_length=100)
+    date_of_birth = forms.DateField(
+        label='date_of_birth', widget=forms.SelectDateWidget,)
+    gender = forms.ChoiceField(choices=genderchoices)
+    shopname = forms.CharField(max_length=50)
+    shopaddress = forms.CharField(max_length=200)
+    shopdesc = forms.CharField(max_length=500)
+    role = forms.CharField(max_length=50)
+
+    class Meta:
+        """meta attribute for this class"""
+        model = User
+
+
 class UserLoginForm(LoginForm):
     """form for user login"""
     def __init__(self, *args, **kwargs):

@@ -13,7 +13,6 @@ from allauth.account.signals import user_signed_up, email_confirmed
 @receiver(email_confirmed)
 def email_confirmed_(request, email_address, **kwargs):
     print("signal called")
-    breakpoint()
     new_email_address = email_address
     user = User.objects.get(email = new_email_address)
     if user.role == "shopowner":

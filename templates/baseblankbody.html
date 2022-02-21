@@ -20,6 +20,7 @@
   <link href="assets/plugins/ladda/ladda.min.css" rel="stylesheet" />
   <link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet" />
   <link href="assets/plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
 
   <!-- SLEEK CSS -->
   <link id="sleek-css" rel="stylesheet" href="{% static 'assets/css/sleek.css' %}"   />
@@ -713,6 +714,8 @@
                       </li>
                       {% block requests %}
                       {% endblock %}
+                      {% block users_list %}
+                      {% endblock %}
                       <li>
                         <a href="#"> <i class="mdi mdi-settings"></i> Account Setting </a>
                       </li>
@@ -780,9 +783,13 @@
 <script src="{% static 'assets/js/date-range.js' %}"></script>
 <script src="{% static 'assets/js/map.js' %}"></script>
 <script src="{% static 'assets/js/custom.js' %}"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js" ></script>
 
-
-
+<script>
+  $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
 
   </body>
 </html>

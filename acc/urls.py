@@ -1,8 +1,9 @@
 """urls mapping for acc app file"""
 from django.urls import path
+from django.contrib.auth.decorators import login_required
 
 from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, \
-     ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView
+     ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView , UserListView , AddUserFormView
 
 
 urlpatterns = [
@@ -14,4 +15,6 @@ urlpatterns = [
     path('edituserdetails/<int:pk>',UserUpdateView.as_view(), name='userupdate_view'),
     path('signupasshop/', ShopSignupFormView.as_view(), name="shopsignup"),
     path('requests', RequestsView.as_view(), name="getallrequests"),
+    path('listusers', UserListView.as_view() , name = "userlist" ),
+    path('adduser' , AddUserFormView.as_view() , name = "adduser" )
 ]
