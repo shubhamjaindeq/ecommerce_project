@@ -1,4 +1,5 @@
 """ORM models are defined maps databse to django views"""
+from secrets import choice
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
@@ -98,3 +99,26 @@ class User(AbstractBaseUser):
     def is_staff_user(self):
         """checks if the user is a staff member"""
         return self.is_admin
+class Product(models.Model):
+    """Model for products listed by shops"""
+    categories = (("electronics","electronics") , ("footwear","footwear") , ("accesories","accesories"))
+    price = models.FloatField()
+    name = models.CharField(max_length = 100)
+    description = models.CharField(max_length = 500)
+    brand = models.CharField(max_length =50)
+    category = models.CharField(choices = categories , max_length = 50)
+    quantity = models.IntegerField()
+    provider = models.ForeignKey(User , on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    def price_of(self):
+        return self.price
+
+    def is_available(self , required):
+        if self.quantity > required:
+            return True
+        else:
+            return False
+

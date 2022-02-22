@@ -13,31 +13,46 @@ from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User , Product
 from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm
 
 
-class IndexView(TemplateView):
+class IndexView(ListView):
     """Landing page"""
     template_name = 'customer/customerindex.html'
+    model = Product
     
-    @method_decorator(login_required)
-    def get(self, request):
+    @method_decorator([login_required])
+    def get(self, request ):
         """gets called if the request methods is get"""
+        if request.user.role == "customer":
+            print("person is customer")
+            productlist = Product.objects.all()
+            return render(request,self.template_name , {'productlist' : productlist})
         
-        if request.user.role == "shopowner":
-                self.template_name = "shop/shopindex.html"
-        if request.user.role == "admin":
-                self.template_name = "adminindex.html"
-        return render(request, self.template_name )
+        elif request.user.role == "shopowner":
+            return render(request,'shop/shopindex.html' )
+
+        else:
+            return render(request,'adminindex.html' )
 
         
-    
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-       return super(self.__class__, self).dispatch(request, *args, **kwargs)
+
 
         
+
+
+
+class CustomerLandingView(ListView):
+
+    model = Product
+    template_name = "customerindex.html"
+
+class ShopLanding(ListView):
+
+    model = Product
+    template_name = "shopindex.html"
+
 
 class ApprovalView(View):
     """handles rendering and fetching of form for admin to accept and reject
