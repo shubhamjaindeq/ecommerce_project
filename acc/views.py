@@ -1,17 +1,18 @@
 """program logic for the acc app"""
-from django.http import JsonResponse 
-from re import template
 import json
-from django.http import HttpResponse
+
 from django.views import View
+from django.http import JsonResponse 
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
 from .models import User
 from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm
 
@@ -69,7 +70,7 @@ class ApprovalView(View):
             return redirect('/requests')
 
 class UserListView(ListView):
-
+    """admin gets a list of user"""
     template_name = 'userlist.html'
     model = User
 
@@ -100,7 +101,6 @@ class ShopSignupFormView(FormView):
     success_url ="/accounts/login"
 
     def form_valid(self, form):
-        
         """verify if the form data is valid and fetch attributes"""
         user = User()
         user.email = form.cleaned_data['email'] 
@@ -126,7 +126,6 @@ class AddUserFormView(FormView):
     def form_valid(self, form):
         """verify if the form data is valid and fetch attributes"""
         print(form.cleaned_data)
-        
         user = User()
         user.email = form.cleaned_data['email'] 
         user.password = form.cleaned_data['password2']
@@ -163,9 +162,7 @@ class UserUpdateByAdminView(View):
     def get(self, request , *args , **kwargs):
         print("user update by admin clalled")
         user_id = self.kwargs['pk']
-
         request_by = User.objects.get(id=user_id)
-        
         responseData = {
         'id': request_by.id,
         'full_name': request_by.full_name,
@@ -190,8 +187,19 @@ class UserUpdateByAdminView(View):
         request_by.role = role
         request_by.email = email
         request_by.save()
-
         return HttpResponse("okay")
+
+class UserDeleteByAdmin(View):
+    """view for admin to delete users"""
+
+    def post(self , request):
+        """recieved post data from ajax"""
+        data = json.loads(request.POST.get('data', ''))
+        id = data['obj']['id']
+        print(id)
+        request_by = User.objects.get(id=id)
+        request_by.delete()
+        
         
 
 
