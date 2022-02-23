@@ -27,6 +27,16 @@
             
     </div>
     {% endfor %}
+    
+    {% if productlist.has_previous %}
+    <a href="?page={{ productlist.previous_page_number }}">Previous</a>
+    {% endif %}    
+    {% if productlist.has_next %}
+    <a href="?page={{ productlist.next_page_number }}">next</a>
+    <br>
+    <a href="?page={{ productlist.paginator.num_pages }}">last &raquo;</a>
+{% endif %}
 </div>
+
 
 {% endblock %}

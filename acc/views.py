@@ -1,6 +1,6 @@
 """program logic for the acc app"""
 import json
-
+from django.core.paginator import Paginator
 from django.views import View
 from django.http import JsonResponse 
 from django.http import HttpResponse
@@ -14,21 +14,28 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from .models import User , Product
-from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm
+from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm , AddShop
 
 
 class IndexView(ListView):
     """Landing page"""
     template_name = 'customer/customerindex.html'
+    
+    
     model = Product
     
     @method_decorator([login_required])
     def get(self, request ):
         """gets called if the request methods is get"""
         if request.user.role == "customer":
+            
             print("person is customer")
             productlist = Product.objects.all()
-            return render(request,self.template_name , {'productlist' : productlist})
+            paginator = Paginator(productlist, 1)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            
+            return render(request,self.template_name , {'productlist': page_obj} )
         
         elif request.user.role == "shopowner":
             return render(request,'shop/shopindex.html' )
@@ -88,6 +95,18 @@ class UserListView(ListView):
     """admin gets a list of user"""
     template_name = 'userlist.html'
     model = User
+
+class ProductListView(ListView):
+    """admin gets a list of user"""
+    template_name = 'shop/productlist.html'
+    model = Product
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(ProductListView, self).get_queryset(*args, **kwargs)
+        products = Product.objects.filter(provider=self.request.user)
+        print(products)
+        #breakpoint()
+        return products 
 
 class UserProfileView(DetailView):
     """Handles My profile view for customer"""
@@ -233,3 +252,77 @@ class ShopUpdateView(UpdateView):
         "shopdesc",
     ]
     success_url ="/"
+
+class AddShopFormView(FormView):
+    template_name = 'shop/addshop.html'
+    form_class = AddShop
+    success_url = '/thanks/'
+
+    def form_valid(self, form):
+        id = self.request.user.id
+        user = User.objects.get(id=id)
+        product = Product()
+        product.name = form.cleaned_data['name']
+        product.price = form.cleaned_data['price']
+        product.description = form.cleaned_data['description']
+        product.image = form.cleaned_data['image']
+        product.brand = form.cleaned_data['brand']
+        product.category = form.cleaned_data['category']
+        product.provider = user
+        product.quantity = form.cleaned_data['quantity']
+        
+        product.save()
+        print("saved")
+        breakpoint()
+        
+class ProductUpdateView(View):
+
+    model = Product
+    
+
+    def get(self, request , *args , **kwargs):
+        print("product update  clalled")
+        user_id = self.kwargs['pk']
+        request_for = Product.objects.get(id=user_id)
+        responseData = {
+        'id' : request_for.id,
+        'name': request_for.name,
+        'price': request_for.price,
+        'category' : request_for.category,
+        'brand' : request_for.brand,
+        'description' : request_for.description,
+        'quantity': request_for.quantity,
+        'image' : json.dumps(str(request_for.image)),
+        'color' : request_for.color,
+        'material' : request_for.material
+    }
+        
+        return JsonResponse(responseData)
+
+    def post(self , request , *args , **kwargs):
+        data = request.POST
+        #print(data)
+        
+        name = data['name']
+        #print(name)
+        id = data['id']
+        category = data['category']
+        quantity = data['quantity']
+        #image = data['image']
+        print(data)
+        breakpoint()
+        color = data['color']
+        material = data['material']
+        brand = data['brand']
+        description = data['description']
+        product = Product.objects.get(id=id)
+        product.category = category
+        product.name = name
+        product.quantity = quantity
+        product.image = image
+        product.color = color
+        product.material = material
+        product.brand = brand
+        product.description = description
+        product.save()
+        return redirect("/listproducts")

@@ -110,6 +110,8 @@ class Product(models.Model):
     quantity = models.IntegerField()
     provider = models.ForeignKey(User , on_delete=models.CASCADE)
     image = models.ImageField(upload_to ='images/', default=None)
+    color = models.CharField(max_length =20 , null=True, blank=True)
+    material = models.CharField(max_length=50 , null=True , blank=True)
 
     def __str__(self):
         return self.name

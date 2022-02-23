@@ -3,7 +3,7 @@ from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
 
-from .models import User
+from .models import Product, User
 
 
 class AdminUserUpdateForm(forms.Form):
@@ -124,3 +124,14 @@ class RequestResponseForm(forms.Form):
         fields = []
 
     response = forms.ChoiceField(choices=choices)
+
+class AddShop(forms.Form):
+    categories = (("electronics","electronics") , ("footwear","footwear") , ("accesories","accesories"))
+    name = forms.CharField()
+    price = forms.IntegerField()
+    category = forms.ChoiceField(choices=categories)
+    description = forms.CharField()
+    image = forms.ImageField()
+    brand = forms.CharField()
+    quantity = forms.IntegerField()
+    
