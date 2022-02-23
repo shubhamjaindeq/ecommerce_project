@@ -180,6 +180,8 @@ STATICFILES_FINDERS = (
    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
    'dajaxice.finders.DajaxiceFinder',
 )
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
 # Default primary key field type

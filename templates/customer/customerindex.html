@@ -1,18 +1,20 @@
 
 {% extends 'customer/customerblankbody.html'  %}
 {% block content %}
-{% for product in productlist %}
 
+{% for product in productlist %}
 <div class="card card-default">
+ 
     <div class="card-header card-header-border-bottom">
-        <h2>Card with Image</h2>
+       
     </div>
     <div class="card-body">
         <div class="row">
             
             <div class="col-md-6 col-xl-3">
                 <div class="card mb-4">
-                    <img class="card-img-top" src="data:image/png;base64,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">
+                
+                    <img class="card-img-top" src="{{product.image.url}}">
                     <div class="card-body">
                         <h5 class="card-title text-primary">{{product.name}}</h5>
                         <p class="card-text pb-3">{{product.description}}</p>
@@ -24,6 +26,7 @@
             </div>
             
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
+
 {% endblock %}

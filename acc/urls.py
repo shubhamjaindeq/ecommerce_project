@@ -21,3 +21,4 @@ urlpatterns = [
     path('userupdatebyadmin/', UserUpdateByAdminView.as_view() , name = "userupdatebyadmin"),
     path('userdeletebyadmin/' , UserDeleteByAdmin.as_view() , name ='userdeletebyadmin' ),
 ]
+

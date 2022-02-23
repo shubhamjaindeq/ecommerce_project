@@ -109,6 +109,7 @@ class Product(models.Model):
     category = models.CharField(choices = categories , max_length = 50)
     quantity = models.IntegerField()
     provider = models.ForeignKey(User , on_delete=models.CASCADE)
+    image = models.ImageField(upload_to ='images/', default=None)
 
     def __str__(self):
         return self.name
