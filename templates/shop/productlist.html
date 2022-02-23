@@ -4,7 +4,7 @@
 
 <table id = "myTable" width = "100%" > 
     <br>  
-<a href ="/adduser" > <button class= "mb-1 btn  disabled btn-success" > Add user</button></a>
+<a href ="/addshop" > <button class= "mb-1 btn  disabled btn-success" > Add Product</button></a>
 <br>
     <thead>
         
@@ -31,8 +31,8 @@
             <td>{{ obj.brand }}</td>
             <td>{{ obj.description }}</td>
             <td>{{ obj.provider.shopname }}</td>
-            <td>{{ obj.provider.color }}</td>
-            <td>{{ obj.provider.material }}</td>
+            <td>{{ obj.color }}</td>
+            <td>{{ obj.material }}</td>
             <td>{{ obj.category }}</td>
             &nbsp;
             <td><button type="button" class="btn btn-primary" onClick="get_data('{{ obj.id }}')" data-toggle="modal" data-target="#exampleModalLong">
@@ -57,7 +57,7 @@
         <form action="#" id="mysecondForm" class="form-container">
         
             
-            <input type="hidden" id ="second_form_id" placeholder="Enter Email" name="email" required>
+            <input type="hidden" id ="second_form_id" name="form_id" required>
             
            
             
@@ -102,8 +102,8 @@
           <br><label for="psw"><b>description</b></label>
           <input type="text"  id = form_description placeholder="Enter Password" name="description" required>
           <br>
-          <label for="psw"><b>image</b></label>
-          <input type="file"  id = form_image placeholder="Enter Password" name="image" required>
+          <!-- <label for="psw"><b>image</b></label>
+          <input type="file"  id = form_image placeholder="Enter Password" name="image" required> -->
           <br><label for="psw"><b>material</b></label>
           <input type="text"  id = form_material placeholder="Enter Password" name="material" required>
           <br>
@@ -132,7 +132,6 @@
         $form = $(this)
         var formData = new FormData(this);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-        console.log(document.getElementById('form_image').value) ;
         var x = document.getElementById('form_id').value;
         $.ajax({
             url: `/productupdate/${x}`,
@@ -148,7 +147,7 @@
                     })
                 }
                 else{
-                    alert(response.message)
+                    
                     window.location = ""
                 }
             },
@@ -176,7 +175,6 @@
                 console.log(response)
                 document.getElementById("form_name").value = response.name;
                 document.getElementById("form_price").value = response.price;
-                document.getElementById("form_brand").value = response.brand;
                 document.getElementById("form_color").value = response.color;
                 document.getElementById("form_id").value = response.id;
                 document.getElementById("form_category").value = response.category;
@@ -184,6 +182,7 @@
                 document.getElementById("form_brand").value = response.brand;
                 //document.getElementById("form_image").value = response.image;
                 document.getElementById("form_quantity").value = response.quantity;
+                document.getElementById("form_material").value = response.material;
                 
 
                 
@@ -246,6 +245,8 @@
         //document.getElementById("mysecondForm").style.display = "block";
         //document.getElementById("myTbody").style.display = "None";
         document.getElementById("second_form_id").value = e;
+        console.log(e);
+
         
         
     }  
@@ -262,7 +263,7 @@
         }
         $.ajax({
             type: 'POST',
-            url: '/userdeletebyadmin/',
+            url: '/deleteproduct/',
             data: {'data': JSON.stringify({'obj': delete_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
             success: function (response) {
                 // if not valid user, alert the user

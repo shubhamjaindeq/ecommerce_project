@@ -273,7 +273,7 @@ class AddShopFormView(FormView):
         
         product.save()
         print("saved")
-        breakpoint()
+        return redirect('/')
         
 class ProductUpdateView(View):
 
@@ -301,16 +301,12 @@ class ProductUpdateView(View):
 
     def post(self , request , *args , **kwargs):
         data = request.POST
-        #print(data)
+        print(data)
         
         name = data['name']
-        #print(name)
         id = data['id']
         category = data['category']
         quantity = data['quantity']
-        #image = data['image']
-        print(data)
-        breakpoint()
         color = data['color']
         material = data['material']
         brand = data['brand']
@@ -319,10 +315,19 @@ class ProductUpdateView(View):
         product.category = category
         product.name = name
         product.quantity = quantity
-        product.image = image
         product.color = color
         product.material = material
         product.brand = brand
         product.description = description
         product.save()
-        return redirect("/listproducts")
+        return redirect("/listproducts/")
+
+class ProductDeleteView(View):
+
+    def post(self , request):
+        """recieved post data from ajax"""
+        data = json.loads(request.POST.get('data', ''))
+        id = data['obj']['id']
+        print(id)
+        request_by = Product.objects.get(id=id)
+        request_by.delete()
