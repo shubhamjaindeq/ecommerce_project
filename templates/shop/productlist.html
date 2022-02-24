@@ -102,8 +102,8 @@
           <br><label for="psw"><b>description</b></label>
           <input type="text"  id = form_description placeholder="Enter Password" name="description" required>
           <br>
-          <!-- <label for="psw"><b>image</b></label>
-          <input type="file"  id = form_image placeholder="Enter Password" name="image" required> -->
+          <label for="psw"><b>image</b></label>
+          <input type="file"  id = "form_image" placeholder="Enter Password" name="image" required>
           <br><label for="psw"><b>material</b></label>
           <input type="text"  id = form_material placeholder="Enter Password" name="material" required>
           <br>
@@ -131,7 +131,10 @@
         console.log("submit called");
         $form = $(this)
         var formData = new FormData(this);
+        var icon = document.getElementById("form_image").files[0];
+        console.log(icon)
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('image' , icon);
         var x = document.getElementById('form_id').value;
         $.ajax({
             url: `/productupdate/${x}`,

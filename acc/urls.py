@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, \
      ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView , \
     UserListView , AddUserFormView , UserUpdateByAdminView , ProductListView ,\
-    UserDeleteByAdmin , AddShopFormView , ProductUpdateView , ProductDeleteView
+    UserDeleteByAdmin , AddShopFormView , ProductUpdateView , ProductDeleteView , ProductDetailView
 
 
 urlpatterns = [
@@ -25,7 +25,8 @@ urlpatterns = [
     path('addshop/<int:pk>' , AddShopFormView.as_view() , name = 'addshop'),
     path('listproducts/', ProductListView.as_view() , name = "productlist" ),
     path('productupdate/<int:pk>', ProductUpdateView.as_view() , name = "productupdate"),
-    path('deleteproduct/', ProductDeleteView.as_view() , name = "deleteproduct")
+    path('deleteproduct/', ProductDeleteView.as_view() , name = "deleteproduct"),
+    path('productdetail/<int:pk>', ProductDetailView.as_view(), name='profile'),
     
 ]
 

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'acc',
     'dajaxice',
     'dajax',
+    'django_filters',
 ]
 TEMPLATE_LOADERS = (
    'django.template.loaders.filesystem.Loader',
@@ -180,6 +181,7 @@ STATICFILES_FINDERS = (
    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
    'dajaxice.finders.DajaxiceFinder',
 )
+
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'

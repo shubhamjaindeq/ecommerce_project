@@ -2,6 +2,8 @@
 from secrets import choice
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 
 class UserManager(BaseUserManager):
@@ -83,6 +85,8 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         """return unique email of that user"""
+        if self.role == "shopowner":
+            return self.shopname
         return self.email
 
     def has_perm(self, perm, obj=None):
@@ -112,6 +116,13 @@ class Product(models.Model):
     image = models.ImageField(upload_to ='images/', default=None)
     color = models.CharField(max_length =20 , null=True, blank=True)
     material = models.CharField(max_length=50 , null=True , blank=True)
+    rating = models.IntegerField(
+        default=1,
+        validators=[
+            MaxValueValidator(100),
+            MinValueValidator(1)
+        ]
+    )
 
     def __str__(self):
         return self.name

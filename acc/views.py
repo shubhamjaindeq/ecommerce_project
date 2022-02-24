@@ -2,6 +2,7 @@
 import json
 from django.core.paginator import Paginator
 from django.views import View
+from django.db.models import Q
 from django.http import JsonResponse 
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -13,6 +14,7 @@ from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
+from .filters import ProductFilter
 from .models import User , Product
 from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm , AddShop
 
@@ -28,14 +30,32 @@ class IndexView(ListView):
     def get(self, request ):
         """gets called if the request methods is get"""
         if request.user.role == "customer":
-            
-            print("person is customer")
             productlist = Product.objects.all()
+            if request.GET.get('search') is not None :
+                print("lgkj")
+                keyword = request.GET.get('search')
+                print(keyword)
+                productlist = productlist.filter(Q(name__icontains=keyword) | Q(description__icontains = keyword ))
+                print(productlist)
+            if request.GET.get('sortby') == "plth":
+                print("plth")
+                productlist = productlist.order_by('price')
+            elif request.GET.get('sortby') == "phtl":
+                productlist = productlist.order_by('-price')
+            elif request.GET.get('sortby') == "rlth":
+                productlist = productlist.order_by('rating')
+            else:
+                productlist = productlist.order_by('-rating')
+            
+            productFilter = ProductFilter(request.GET, queryset=productlist)
+            
+            productlist = productFilter.qs
+            
             paginator = Paginator(productlist, 1)
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             
-            return render(request,self.template_name , {'productlist': page_obj} )
+            return render(request,self.template_name , {'productlist': page_obj , 'productFilter' : productFilter } )
         
         elif request.user.role == "shopowner":
             return render(request,'shop/shopindex.html' )
@@ -302,7 +322,10 @@ class ProductUpdateView(View):
 
     def post(self , request , *args , **kwargs):
         data = request.POST
-        print(data)
+        print(request.FILES['image'])
+        #breakpoint()
+        #print("breakpoint")
+        #print(data['image'])
         
         name = data['name']
         id = data['id']
@@ -316,6 +339,7 @@ class ProductUpdateView(View):
         product.category = category
         product.name = name
         product.quantity = quantity
+        product.image = request.FILES['image']
         product.color = color
         product.material = material
         product.brand = brand
@@ -332,3 +356,8 @@ class ProductDeleteView(View):
         print(id)
         request_by = Product.objects.get(id=id)
         request_by.delete()
+
+class ProductDetailView(DetailView):
+    """Handles My profile view for customer"""
+    model = Product
+    template_name = 'customer/productdetail.html'
