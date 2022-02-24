@@ -107,6 +107,7 @@ class ProductListView(ListView):
         print(products)
         #breakpoint()
         return products 
+        
 
 class UserProfileView(DetailView):
     """Handles My profile view for customer"""
