@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from .filters import ProductFilter
-from .models import User , Product
+from .models import User , Product , Wishlist , Cart , CartItems
 from .forms import RequestResponseForm, ShopSignupForm , AddUserForm , AdminUserUpdateForm , AddShop
 
 
@@ -215,7 +215,6 @@ class UserUpdateByAdminView(View):
     template_name = "updateuserbyadmin.html"
 
     def get(self, request , *args , **kwargs):
-        print("user update by admin clalled")
         user_id = self.kwargs['pk']
         request_by = User.objects.get(id=user_id)
         responseData = {
@@ -361,3 +360,99 @@ class ProductDetailView(DetailView):
     """Handles My profile view for customer"""
     model = Product
     template_name = 'customer/productdetail.html'
+
+class BuyProductView(View):
+    def get(self , request, **kwargs):
+
+        print(self.kwargs)
+        return HttpResponse("bought")
+
+class AddToWishlistView(View):
+    def get(self, request, **kwrags):
+
+        product_id = self.kwargs['pk']
+        id = request.user.id
+        product = Product.objects.get(id=product_id)
+        user = User.objects.get(id=id)
+        if hasattr(user, 'wishlist'):
+            wishl = user.wishlist
+            wishl.items.add(product)
+        else:
+            wishl = Wishlist(user = user)
+            wishl.save()
+            wishl.items.add(product)
+        wishl.save()
+
+        
+
+        return redirect('/')
+
+class WishListView(View):
+
+    def get(self,request, **kwrags):
+        user_id = request.user.id
+        user = User.objects.get(id = user_id)
+        wishl = user.wishlist
+        object_list = wishl.items.all()
+        print(user)
+        return render(request, 'customer/mywishlist.html' , { 'object_list' : object_list })
+
+class DeleteFromWishListView(View):
+
+    def post(self,request,**kwargs):
+        data = json.loads(request.POST.get('data', ''))
+        product_id = data['obj']['id']
+        product = Product.objects.get(id=product_id)
+        user = User.objects.get(id=request.user.id)
+        wishl = user.wishlist
+        wishl.items.remove(product)
+        return redirect('/mywishlist/' + str(request.user.id) )
+
+class AddToCartView(View):
+
+    def get(self, request, **kwargs):
+        print("addtocart called" , kwargs)
+        product = Product.objects.get(id = kwargs['pk'])
+        user = User.objects.get(id=request.user.id)
+        if hasattr(user, 'cart'):
+            cart = user.cart
+            content_list = cart.cartitems_set.all()
+            found = False
+            for entry in content_list:
+                if entry.product == product:
+                    entry.quantity += 1
+                    entry.save()
+                    found = True
+                    break
+            if not found:
+                entry = CartItems(product = product , quantity = 1 , cart = cart)
+                entry.save()
+                
+            
+        else:
+            cart = Cart(user=user)
+            cart.save()
+            cartitems =  CartItems(product , 1 , cart)
+            cartitems.save()
+
+
+
+        return redirect('/mycart/' + str(user.id))
+
+
+class CartView(ListView):
+    template_name = "customer/mycart.html"
+    def get_queryset(self):
+        print(self.request.user)
+        user = self.request.user
+        object_list = user.cart.cartitems_set.all()
+        return object_list
+
+class DeleteFromCartView(View):
+
+    def post(self,request,**kwargs):
+        data = json.loads(request.POST.get('data', ''))
+        entry_id = data['obj']['id']
+        entry = CartItems.objects.get(id=entry_id)
+        entry.delete()
+        return redirect('/mycart/' + str(request.user.id) )

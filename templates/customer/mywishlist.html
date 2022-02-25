@@ -1,0 +1,124 @@
+{% extends 'customer/customerblankbody.html' %}
+{% block content %}
+
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+
+<br>
+    <thead>
+        
+        <th></th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Brand</th>
+        <th>Description</th>
+        <th>Company</th>
+        <th>colour</th>
+        <th>Material</th>
+        <th>Category</th>
+        
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in object_list %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.name }}</td>
+            <td>{{ obj.price }}</td>
+            <td>{{ obj.brand }}</td>
+            <td>{{ obj.description }}</td>
+            <td>{{ obj.provider.shopname }}</td>
+            <td>{{ obj.color }}</td>
+            <td>{{ obj.material }}</td>
+            <td>{{ obj.category }}</td>
+            &nbsp;
+            
+             <td>     <button type="button" class="btn btn-primary" data-toggle="modal"  onclick ="delete_data('{{ obj.id }}')" data-target=".bd-example-modal-sm">Delete</button></td>
+            
+            
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <p>delete this?</p>
+        
+        <form action="#" id="mysecondForm" class="form-container">
+        
+            
+            <input type="hidden" id ="second_form_id" name="form_id" required>
+            
+           
+            
+            <button type="button" class="btn" onclick="confirm_delete()" >Delete</button>
+            <button type="button" class="btn cancel" onclick="closesecondForm()">No</button>
+          </form>
+      </div>
+    </div>
+  </div>
+<script>
+
+   
+   
+    function closeForm(e){
+        document.getElementById("myForm").style.display = "None";
+        document.getElementById("myTbody").style.display = "inherit";
+        //console.log(e)
+        
+    }
+    function closesecondForm(e){
+        document.getElementById("mysecondForm").style.display = "None";
+        document.getElementById("myTbody").style.display = "inherit";
+        //console.log(e)
+        
+    }
+   function delete_data(e){
+        console.log("delete_data")
+        //document.getElementById("mysecondForm").style.display = "block";
+        //document.getElementById("myTbody").style.display = "None";
+        document.getElementById("second_form_id").value = e;
+        console.log(e);
+
+        
+        
+    }  
+    function confirm_delete(){
+        id = document.getElementById("second_form_id").value
+        console.log(id)
+        delete_data = {
+            'id' : id,
+            'data': {
+            'content': 'xxx',
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/deletefromwishlist/',
+            data: {'data': JSON.stringify({'obj': delete_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function (response) {
+                // if not valid user, alert the user
+                console.log(response)
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+
+        
+    }
+</script>
+
+{% endblock %}
+
+

@@ -136,3 +136,17 @@ class Product(models.Model):
         else:
             return False
 
+class Wishlist(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    items = models.ManyToManyField(Product)
+
+class Cart(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    
+class CartItems(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default = 1)
+    cart = models.ForeignKey(Cart , on_delete=models.CASCADE)
+    
+
+

@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, \
      ShopSignupFormView, ShopUpdateView, RequestsView, ShopProfileView , \
     UserListView , AddUserFormView , UserUpdateByAdminView , ProductListView ,\
-    UserDeleteByAdmin , AddShopFormView , ProductUpdateView , ProductDeleteView , ProductDetailView
+    UserDeleteByAdmin , AddShopFormView , ProductUpdateView , ProductDeleteView , \
+    ProductDetailView , BuyProductView , AddToWishlistView , WishListView ,\
+    DeleteFromWishListView , AddToCartView  , CartView , DeleteFromCartView 
 
 
 urlpatterns = [
@@ -27,6 +29,14 @@ urlpatterns = [
     path('productupdate/<int:pk>', ProductUpdateView.as_view() , name = "productupdate"),
     path('deleteproduct/', ProductDeleteView.as_view() , name = "deleteproduct"),
     path('productdetail/<int:pk>', ProductDetailView.as_view(), name='profile'),
+    path('buyproduct/<int:pk>', BuyProductView.as_view() , name = "buyproduct"),
+    path('addtowishlist/<int:pk>', AddToWishlistView.as_view(), name = 'addtowishlist'),
+    path('mywishlist/<int:pk>', WishListView.as_view(), name="mywishlist"),
+    path('deletefromwishlist/' , DeleteFromWishListView.as_view() , name="deletefromwishlist" ),
+    path('addtocart/<int:pk>', AddToCartView.as_view(), name = "addtocart"),
+    path('mycart/<int:pk>' , CartView.as_view(), name = "mycart" ),
+    path('deletefromcart/' , DeleteFromCartView.as_view() , name="deletefromcart" ),
+    
     
 ]
 
