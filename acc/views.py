@@ -450,7 +450,7 @@ class CartView(ListView):
 
 class DeleteFromCartView(View):
 
-    def post(self,request,**kwargs):
+    def post(self,request):
         data = json.loads(request.POST.get('data', ''))
         entry_id = data['obj']['id']
         entry = CartItems.objects.get(id=entry_id)
