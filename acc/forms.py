@@ -3,10 +3,11 @@ from django import forms
 
 from allauth.account.forms import SignupForm, LoginForm
 
-from .models import Product, User
+from .models import User
 
 
 class AdminUserUpdateForm(forms.Form):
+    """Form for admin to update user details"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -112,7 +113,7 @@ class RequestResponseForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
     choices = [
         ("approve", "approve"),
         ("reject", "reject")
@@ -125,8 +126,12 @@ class RequestResponseForm(forms.Form):
 
     response = forms.ChoiceField(choices=choices)
 
-class AddShop(forms.Form):
-    categories = (("electronics","electronics") , ("footwear","footwear") , ("accesories","accesories"))
+class AddProduct(forms.Form):
+    """Lets Shopowner add products"""
+    categories = (
+        ("electronics","electronics") , ("footwear","footwear") ,
+        ("accesories","accesories")
+    )
     name = forms.CharField()
     price = forms.IntegerField()
     category = forms.ChoiceField(choices=categories)

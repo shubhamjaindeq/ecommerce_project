@@ -17,3 +17,8 @@
     <i class="mdi mdi-account"></i> My Cart
   </a>
 {% endblock %}
+{% block myorders %}
+<a href="/myorders/{{user.id}}">
+  <i class="mdi mdi-account"></i> My Orders
+</a>
+{% endblock %}

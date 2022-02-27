@@ -702,10 +702,17 @@
                         <div class="d-inline-block">
                           {{user.full_name}} <small class="pt-1">{{user.email}}</small>
                         </div>
+                        <br>
+                        {{user.role}}   
                       </li>
 
                       <li>
                         {% block profilelink %}
+                        
+                        {% endblock %}
+                      </li>
+                      <li>
+                        {% block allproducts %}
                         
                         {% endblock %}
                       </li>
@@ -720,19 +727,15 @@
                         {% endblock %}
                       </li>
                       <li>
-                        <a href="email-inbox.html">
-                          <i class="mdi mdi-email"></i> Message
-                        </a>
+                        {% block myorders %}
+                        {% endblock %}
                       </li>
                       {% block requests %}
                       {% endblock %}
                       {% block users_list %}
                       {% endblock %}
-                      <li>
-                        <a href="#"> <i class="mdi mdi-settings"></i> Account Setting </a>
-                      </li>
-                      <li>
-                        <a href="#"> <i class="mdi mdi-settings"></i> {{user.role}} </a>
+                      
+                        
                       </li>
                       {% block addshop %}
                       {% endblock %}
@@ -755,18 +758,7 @@
 {% endblock %}
 						
 
-                  <footer class="footer mt-auto">
-            <div class="copyright bg-white">
-              <p>
-                &copy; <span id="copy-year">2019</span> Copyright Sleek Dashboard Bootstrap Template by
-                <a
-                  class="text-primary"
-                  href="http://www.iamabdus.com/"
-                  target="_blank"
-                  >Abdus</a
-                >.
-              </p>
-            </div>
+           
             <script>
                 var d = new Date();
                 var year = d.getFullYear();
@@ -816,6 +808,6 @@
 
 </script>
 {% block javascript %}
-  {% endblock javascript%}
+  {% endblock javascript %}
   </body>
 </html>

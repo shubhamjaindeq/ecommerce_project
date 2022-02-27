@@ -1,9 +1,7 @@
 """ORM models are defined maps databse to django views"""
-from secrets import choice
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class UserManager(BaseUserManager):
@@ -32,9 +30,12 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self,  full_name=None, date_of_birth=None, is_shop_user=False, shopname=None,
-                        shopaddress=None, shopdesc=None, email=None, gender=None,address=None,
-                        password=None):
+    def create_superuser(
+                        self,  full_name=None, date_of_birth=None,
+                        shopname=None,shopaddress=None, shopdesc=None, email=None,
+                        gender=None,address=None,
+                        password=None
+        ):
         """creates admin"""
 
         user = self.create_user(
@@ -89,12 +90,12 @@ class User(AbstractBaseUser):
             return self.shopname
         return self.email
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, obj=None):
         """checks if the user has permission to access"""
         print(self,obj)
         return True
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self):
         """checks if the user has permission to access"""
         print(self)
         return True
@@ -103,9 +104,14 @@ class User(AbstractBaseUser):
     def is_staff_user(self):
         """checks if the user is a staff member"""
         return self.is_admin
+
+
 class Product(models.Model):
     """Model for products listed by shops"""
-    categories = (("electronics","electronics") , ("footwear","footwear") , ("accesories","accesories"))
+    categories = (
+        ("electronics","electronics") , ("footwear","footwear") ,
+        ("accesories","accesories")
+    )
     price = models.FloatField()
     name = models.CharField(max_length = 100)
     description = models.CharField(max_length = 500)
@@ -125,28 +131,33 @@ class Product(models.Model):
     )
 
     def __str__(self):
+        """returns the name of product"""
         return self.name
 
     def price_of(self):
+        """returns the price of product"""
+
         return self.price
 
     def is_available(self , required):
-        if self.quantity > required:
-            return True
-        else:
-            return False
+        """check if the product is available"""
+
+        return self.quantity > required
 
 class Wishlist(models.Model):
+    """Model to shortlist Products that you like"""
+
     user = models.OneToOneField(User , on_delete=models.CASCADE)
     items = models.ManyToManyField(Product)
 
 class Cart(models.Model):
+    """model that contains all items to buy"""
+
     user = models.OneToOneField(User , on_delete=models.CASCADE)
-    
+
 class CartItems(models.Model):
+    """Constitutes entries for cart"""
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
     cart = models.ForeignKey(Cart , on_delete=models.CASCADE)
-    
-
-
