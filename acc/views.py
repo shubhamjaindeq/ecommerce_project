@@ -551,7 +551,8 @@ class CheckoutView(View):
             quantity = item.quantity
             total = product.price * quantity
             total_price += total
-            orderitem = OrderItems(order=order, item = product, quantity=quantity, total=total)
+            provider = item.product.provider
+            orderitem = OrderItems(order=order, item = product, quantity=quantity, total=total, provider = provider)
             orderitem.save()
 
         order.total = total_price
@@ -608,3 +609,17 @@ class RemoveItemView(View):
         print(order_id)
         orderitem.delete()
         return redirect("/orderdetail/"+order_id)
+
+class ShopOrderView(ListView):
+
+    template_name = "shop/myorders.html"
+    model = Order
+
+    def get_queryset(self):
+        """fetch and prepare data for the view"""
+
+        user = User.objects.get(id=self.request.user.id)
+        items_list = OrderItems.objects.filter(provider = user)
+        print(items_list)
+        
+        return items_list

@@ -177,3 +177,4 @@ class OrderItems(models.Model):
     item = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
     total = models.IntegerField()
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
