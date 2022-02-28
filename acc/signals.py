@@ -8,7 +8,7 @@ from .models import User
 
 
 @receiver(email_confirmed)
-def email_confirmed_(request, email_address, **kwargs):
+def email_confirmed_(email_address, **kwargs):
     """sends approval mail for shopowners"""
 
     new_email_address = email_address

@@ -100,8 +100,6 @@ class AddUserForm(SignupForm):
 
 class UserLoginForm(LoginForm):
     """form for user login"""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     class Meta:
         """meta attribtes"""
@@ -139,4 +137,6 @@ class AddProduct(forms.Form):
     image = forms.ImageField()
     brand = forms.CharField()
     quantity = forms.IntegerField()
+    color = forms.CharField()
+    material = forms.CharField()
     

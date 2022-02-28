@@ -95,7 +95,7 @@ class User(AbstractBaseUser):
         print(self,obj)
         return True
 
-    def has_module_perms(self):
+    def has_module_perms(self, app_label):
         """checks if the user has permission to access"""
         print(self)
         return True
@@ -161,3 +161,19 @@ class CartItems(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
     cart = models.ForeignKey(Cart , on_delete=models.CASCADE)
+
+class Order(models.Model):
+    """Creates a particular order for a user when he hits buy"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+    total = models.IntegerField()
+    status = models.CharField(max_length=10)
+
+
+class OrderItems(models.Model):
+    """Particular entry for each product"""
+
+    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    item = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default = 1)
+    total = models.IntegerField()
