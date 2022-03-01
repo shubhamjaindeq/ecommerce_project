@@ -56,6 +56,8 @@
                     <th scope="col">Item</th>
                     <th scope="col">Quantity</th>
                     <th scope="col">total</th>
+                    <th scope="col">Status</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -67,6 +69,8 @@
                     <td>{{ item.item }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.total }}</td>
+                    <td>{{ item.status }}</td>
+                    
                     <td> <a href="/removeitem/{{item.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
                         Remove Item
                       </button></a>

@@ -1,0 +1,50 @@
+{% extends 'shop/shopblankbody.html' %}
+{% block content %}
+<form method = "get" width="150 %">
+    {{ salesFilter.form }}
+    <button type = "submit" >Submit</button>
+</form>
+<table id = "myTable" width = "100%" > 
+    <br>  
+
+<br>
+    <thead>
+        
+        <th>ID</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Brand</th>
+        <th>Initital Quantity</th>
+        <th>Sold Count</th>
+        
+        
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in productlist %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.name }}</td>
+            <td>{{ obj.category }}</td>
+            <td>{{ obj.brand }}</td>
+            <td>{{ obj.quantity }}</td>
+            <td>{{ obj.soldcount }}</td>
+            <td>{{ obj.percentsale }}</td>
+  
+           
+            &nbsp;
+            
+            
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+
+
+{% endblock %}
