@@ -736,14 +736,20 @@
                       </li>
                       {% block requests %}
                       {% endblock %}
+                      <li>
                       {% block users_list %}
                       {% endblock %}
                       
                         
                       </li>
+                      <li>
                       {% block addshop %}
                       {% endblock %}
-                      
+                    </li>
+                    <li>
+                      {% block userorders %}
+                      {% endblock %}
+                    </li>
 
                       <li class="dropdown-footer">
                         <a href="/accounts/logout"> <i class="mdi mdi-logout"></i> Log Out </a>

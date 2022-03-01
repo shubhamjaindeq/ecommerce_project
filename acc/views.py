@@ -681,3 +681,21 @@ class SalesReportView(ListView):
                 { 'productlist': productlist, 'salesFilter' : productfilter }
             )
 
+class UserOrderView(ListView):
+
+    template_name = "userorders.html"
+    model = Order
+
+    def get(self, request):
+
+        if request.user.role != "admin":
+            return redirect("/accounts/logout")
+        
+        orderlist = Order.objects.all()
+        return render(
+                request, self.template_name,
+                { 'orderlist': orderlist }
+            )
+
+        
+        

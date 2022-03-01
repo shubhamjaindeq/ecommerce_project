@@ -8,7 +8,7 @@ from acc.views import ApprovalView, IndexView, UserProfileView, UserUpdateView, 
      ProductDetailView, BuyNowView , AddToWishlistView , WishListView ,\
      DeleteFromWishListView, AddToCartView, CartView, DeleteFromCartView, CheckoutView, \
      MyOrdersView, CancelOrderView, OrderDetailView, RemoveItemView , ShopOrderView, \
-     ItemStatusUpdateView, SalesReportView
+     ItemStatusUpdateView, SalesReportView, UserOrderView
 
 
 urlpatterns = [
@@ -48,4 +48,5 @@ urlpatterns = [
     path('shoporder/', ShopOrderView.as_view(), name = "shoporder"),
     path('itemstatusupdate/<int:pk>', ItemStatusUpdateView.as_view(), name = "itemstatusupdate"),
     path('salesreport/', SalesReportView.as_view() , name = "salesreport"),
+    path('userorders', UserOrderView.as_view(), name = "userorders"),
 ]
