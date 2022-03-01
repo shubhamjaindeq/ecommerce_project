@@ -3,6 +3,7 @@ import json
 import datetime
 
 from django.views import View
+from django.db.models import F
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -14,7 +15,7 @@ from django.views.generic.detail import DetailView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
-from .filters import ProductFilter
+from .filters import ProductFilter, SalesFilter
 from .models import User, Product, Wishlist, Cart, CartItems, Order, OrderItems
 from .forms import RequestResponseForm, ShopSignupForm, AddUserForm,  AddProduct
 
@@ -552,8 +553,10 @@ class CheckoutView(View):
             total = product.price * quantity
             total_price += total
             provider = item.product.provider
+            product.soldcount  += item.quantity
             orderitem = OrderItems(order=order, item = product, quantity=quantity, total=total, provider = provider)
             orderitem.save()
+            product.save()
 
         order.total = total_price
         order.status = "paid"
@@ -611,15 +614,70 @@ class RemoveItemView(View):
         return redirect("/orderdetail/"+order_id)
 
 class ShopOrderView(ListView):
+    """fetch orders for a particular shop"""
 
     template_name = "shop/myorders.html"
-    model = Order
+    model = OrderItems
 
     def get_queryset(self):
         """fetch and prepare data for the view"""
 
         user = User.objects.get(id=self.request.user.id)
         items_list = OrderItems.objects.filter(provider = user)
-        print(items_list)
+        print(items_list[0].quantity)
         
         return items_list
+
+class ItemStatusUpdateView(View):
+    """Update item status by shop"""
+
+    model = OrderItems
+
+    def get(self, request, **kwargs):
+        """gets called if the request method is get
+        and prefills data"""
+
+        if request.user.role != "shopowner":
+            return redirect("/accounts/logout")
+        print("product update  clalled")
+        print(self.kwargs)
+        order_item = OrderItems.objects.get(id=self.kwargs['pk'])
+        responsedata = {
+        'id' : order_item.id,
+        'status' : order_item.status,
+        
+    }
+        return JsonResponse(responsedata)
+
+    def post(self, request , **kwargs):
+        """gets called if the request method is post and data is updated"""
+
+        if request.user.role != "shopowner":
+            return redirect("/accounts/logout")
+        data = request.POST
+        order_item_id = kwargs['pk']
+        new_status = data['status']
+        order_item = OrderItems.objects.get(id=order_item_id)
+        order_item.status = new_status
+        order_item.save()
+        return redirect("/listproducts/")
+
+class SalesReportView(ListView):
+    """renders sales detail for particular shop"""
+
+    template_name = "shop/salesreport.html"
+    model = Product
+
+    def get(self, request):
+        """Fetches product data for Sales report"""
+
+        user = User.objects.get(id=request.user.id)
+        products = Product.objects.annotate(percentsale = F("soldcount") * 100 / F("quantity")).filter(provider = user)
+        
+        productfilter = SalesFilter(request.GET, queryset=products)
+        productlist = productfilter.qs
+        return render(
+                self.request, self.template_name,
+                { 'productlist': productlist, 'salesFilter' : productfilter }
+            )
+

@@ -118,6 +118,7 @@ class Product(models.Model):
     brand = models.CharField(max_length =50)
     category = models.CharField(choices = categories , max_length = 50)
     quantity = models.IntegerField()
+    soldcount = models.IntegerField(default=0)
     provider = models.ForeignKey(User , on_delete=models.CASCADE)
     image = models.ImageField(upload_to ='images/', default=None)
     color = models.CharField(max_length =20 , null=True, blank=True)
@@ -178,3 +179,4 @@ class OrderItems(models.Model):
     quantity = models.IntegerField(default = 1)
     total = models.IntegerField()
     provider = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    status = models.CharField(max_length=50, default = 'Waiting for delivery')

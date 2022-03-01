@@ -13,3 +13,12 @@ class ProductFilter(django_filters.FilterSet):
         model = Product
         fields = '__all__'
         exclude = ['image','quantity' , 'description']
+
+class SalesFilter(django_filters.FilterSet):
+    """custom filter"""
+
+    class Meta:
+        """meta attributes for this filter"""
+        model = Product
+        fields = '__all__'
+        exclude = ['image','quantity', 'description', 'price', 'name', 'company', 'soldcount', 'provider', 'material', 'rating', 'color']
