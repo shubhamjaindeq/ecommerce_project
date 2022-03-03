@@ -13,16 +13,16 @@ class UserManager(BaseUserManager):
 
         if not email:
             raise ValueError('Users must have an email address attached ')
-
         user = self.model(
             email=self.normalize_email(email),
-            full_name=full_name,
-            date_of_birth=date_of_birth,
-            gender=gender,
-            address=address,
-            role=role
+            full_name=full_name
         )
         user.set_password(password)
+        user.role = role
+        user.full_name= full_name
+        user.date_of_birth= date_of_birth
+        user.gender= gender
+        user.address= address
         user.is_active = True
         user.is_staff = False
         user.is_admin = False
@@ -32,7 +32,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(
                         self,  full_name=None, date_of_birth=None,
-                        shopname=None,shopaddress=None, shopdesc=None, email=None,
+                        shopname=None,shopaddress=None,role = "admin", shopdesc=None, email=None,
                         gender=None,address=None,
                         password=None
         ):
@@ -45,13 +45,13 @@ class UserManager(BaseUserManager):
             gender=gender,
             address=address,
             date_of_birth=date_of_birth,
+            role = role
         )
         user.shopname = shopname
         user.shopaddress = shopaddress
         user.shopdesc = shopdesc
         user.is_admin = True
         user.is_staff = True
-        user.role = "admin"
         user.save()
         return user
 
@@ -74,7 +74,7 @@ class User(AbstractBaseUser):
     address = models.CharField(max_length=200, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    role = models.CharField(max_length=10)
+    role = models.CharField(max_length=10, default="customer")
     is_staff = models.BooleanField(default=False)
     objects = UserManager()
     shopaddress = models.CharField(null=True, blank=True, max_length=200)
