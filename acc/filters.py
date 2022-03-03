@@ -22,3 +22,4 @@ class SalesFilter(django_filters.FilterSet):
         model = Product
         fields = '__all__'
         exclude = ['image','quantity', 'description', 'price', 'name', 'company', 'soldcount', 'provider', 'material', 'rating', 'color']
+

@@ -1,0 +1,49 @@
+{% extends 'adminblankbody.html' %}
+{% block content %}
+
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+
+<br>
+    <thead>
+        
+        <th>ID</th>
+        <th>Email</th>
+        <th>Shop Name</th>
+        <th>Shop Address</th>
+        
+ 
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in shoplist %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.email }}</td>
+            <td>{{ obj.shopname }}</td>
+            <td>{{ obj.shopaddress }}</td>
+            
+                
+                <td> <a href="/shopdetail/{{obj.id}}"> <button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
+                Order Details
+              </button> </a> </td>
+              <td> <a href="/productlist/{{obj.id}}"> <button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
+                Products
+              </button> </a> </td>
+            
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+
+
+{% endblock %}
+
+

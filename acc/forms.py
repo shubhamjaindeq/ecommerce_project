@@ -123,6 +123,7 @@ class RequestResponseForm(forms.Form):
         fields = []
 
     response = forms.ChoiceField(choices=choices)
+    message = forms.CharField(max_length=200)
 
 class AddProduct(forms.Form):
     """Lets Shopowner add products"""

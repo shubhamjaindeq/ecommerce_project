@@ -1,0 +1,41 @@
+{% extends 'adminblankbody.html' %}
+{% block content %}
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+
+<br>
+    <thead>
+        
+        <th>Order</th>
+        <th>Product</th>
+        <th>quantity</th>
+        <th>total</th>
+        <th>Status</th>
+ 
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in items_list %}
+        <tr>
+            <td>{{ obj.order }}</td>
+            <td>{{ obj.item }}</td>
+            <td>{{ obj.quantity }}</td>
+            <td>{{ obj.total }}</td>
+            <td>{{ obj.status }}</td>
+            
+                
+               
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+
+
+{% endblock %}

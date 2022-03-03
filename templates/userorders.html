@@ -12,26 +12,25 @@
         <th>By</th>
         <th>total</th>
         <th>Status</th>
+        <th>Date</th>
  
         
 
     </thead>
     
     <tbody  id = "myTbody">
-        {% for obj in object_list %}
+        {% for obj in orderlist %}
         <tr>
             <td>{{ obj.id }}</td>
-            <td>{{ obj.email }}</td>
-            <td>{{ obj.full_name }}</td>
-            <td>{{ obj.address }}</td>
-            <td>{{ obj.gender }}</td>
-            <td>{{ obj.role }}</td>
-                <td><button type="button" class="btn btn-primary" onClick="get_data('{{ obj.id }}')" data-toggle="modal" data-target="#exampleModalLong">
-                    Update
-                  </button></td>
-                <td><button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
-                Delete
-              </button></td>
+            <td>{{ obj.user }}</td>
+            <td>{{ obj.total }}</td>
+            <td>{{ obj.status }}</td>
+            <td>{{ obj.date }}</td>
+            
+                
+                <td> <a href="/orderdetailforadmin/{{obj.id}}"> <button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
+                Details
+              </button> </a> </td>
             
             
         </tr>
