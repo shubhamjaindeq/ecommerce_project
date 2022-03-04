@@ -87,30 +87,34 @@ class CustomerAuthTest(TestCase):
     def test_login(self):
 
         response = self.client.post("/accounts/signup/", data={
-            'email': self.email,
+            'email': "shubham0109jain@gmail.com",
             'full_name': self.full_name,
             'address': self.address,
             "date_of_birth_month": self.date_of_birth_month,
             "date_of_birth_day": self.date_of_birth_day,
             "date_of_birth_year": self.date_of_birth_year,
             "gender": self.gender,
-            'password1': self.password1,
-            'password2': self.password2,
+            'password1': "shubham@1",
+            'password2': "shubham@1",
             "next" : "/",
         })
-        verify_response = self.client.post(self.verifyurl, data={})
+        #print(response)
+        #print(mail.outbox[0].body)
+        url = "/accounts/confirm-email/MQ:1nQ0hf:_pXHKfp1eJV3_0dON38uvTgAnM6FGCxpxscTJNUFCuQ/"
+        verify_response = self.client.post(url, data={})
+        #print(verify_response)
         login_response = self.client.get(verify_response.url)
         self.assertTemplateUsed(login_response, template_name="account/login.html")
         users = User.objects.all()
-        print(users[0])
+        print(users)
         emails = EmailAddress.objects.all()
         print(emails[0].verified)
         login_req = self.client.post("/accounts/login/", data = {
-            'login': self.email,
-            'password': self.password1
+            'login': "shubham0109jain@gmail.com",
+            'password': "shubham@1",
             
         } )
-        print(login_req , "is response")
+        #print(login_req , "is response")
         response = self.client.get("")
         #print(response)
         #HTTP_X_REQUESTED_WITH="XMLHttpRequest"
