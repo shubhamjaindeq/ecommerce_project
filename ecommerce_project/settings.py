@@ -46,15 +46,8 @@ INSTALLED_APPS = [
     'dajaxice',
     'dajax',
     'django_filters',
-    'django_nose',
 ]
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=foo,bar',
-]
 
 TEMPLATE_LOADERS = (
    'django.template.loaders.filesystem.Loader',

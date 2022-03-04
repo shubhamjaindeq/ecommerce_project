@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 
 from allauth.account.admin import EmailAddress
 
-from.models import User
+from acc.models import User
 
 class CustomerAuthTest(TestCase):
 
@@ -24,7 +24,6 @@ class CustomerAuthTest(TestCase):
         self.verifyurl = "/accounts/confirm-email/MQ:1nPjV9:M8uIY2IvL3yFqt2XcCoYQkQx3j7vlF2ZhGuS2wCUDsE/"
 
     def test_create_user_as_customer(self):
-
         user = User.objects.create_user(
             full_name = "Shubham Jain",
             date_of_birth = datetime.date.today(),
