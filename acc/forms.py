@@ -39,10 +39,10 @@ class CustomerSignupForm(SignupForm):
         user = User()
         user.role = "customer"
         user.email = self.cleaned_data['email']
-        user.set_password(user.password)
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']
+        user.set_password(self.cleaned_data['password1'])
         user.date_of_birth = self.cleaned_data['date_of_birth']
         user.save()
         return user

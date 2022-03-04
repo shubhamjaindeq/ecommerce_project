@@ -8,7 +8,7 @@ class UserManager(BaseUserManager):
     """manager for user , overrides creation of new users"""
 
     def create_user(self, full_name=None, date_of_birth=None, email=None, gender=None,
-                    address=None, role=None, password=None):
+                    address=None, role=None, password=None, is_admin=False, shopname = None, shopdesc = None, shopaddress = None):
         """create customer and shop"""
 
         if not email:
@@ -25,8 +25,10 @@ class UserManager(BaseUserManager):
         user.address= address
         user.is_active = True
         user.is_staff = False
-        user.is_admin = False
         user.set_password(password)
+        user.shopname = shopname
+        user.shopaddress = shopaddress
+        user.shopdesc = shopdesc
         user.save()
         return user
 
@@ -37,7 +39,6 @@ class UserManager(BaseUserManager):
                         password=None
         ):
         """creates admin"""
-
         user = self.create_user(
             email=email,
             password=password,
@@ -45,7 +46,7 @@ class UserManager(BaseUserManager):
             gender=gender,
             address=address,
             date_of_birth=date_of_birth,
-            role = role
+            role = role,
         )
         user.shopname = shopname
         user.shopaddress = shopaddress
