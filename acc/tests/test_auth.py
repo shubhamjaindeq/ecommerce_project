@@ -1,7 +1,6 @@
 """design and run tests for your appliaction"""
 import datetime
 
-from django.core import mail
 from django.test import TestCase, Client
 
 from allauth.account.admin import EmailAddress
@@ -27,7 +26,7 @@ class CustomerAuthTest(TestCase):
         user = User.objects.create_user(
             full_name = "Shubham Jain",
             date_of_birth = datetime.date.today(),
-            email = "hedoca5169@zneep.com",
+            email = self.email,
             gender = "male",
             address = "123 Main street",
             role = "customer",
@@ -239,8 +238,6 @@ class ShopAuthTest(TestCase):
             "shopaddress" : self.shopaddress,
             "shopdesc": self.shopdesc,
         })
-        #print(User.objects.get(email = self.email).is_active)
-        #print(verify_response)
         login_req = self.client.post("/accounts/login/", data = {
             'login': self.email,
             'password': self.password1,
