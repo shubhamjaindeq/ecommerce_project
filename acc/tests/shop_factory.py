@@ -8,7 +8,7 @@ class ShopFactory(factory.Factory):
     class Meta:
         model = User
 
-    email = "shubham1900jain@gmail.com"
+    email = "yepin58022@toudrum.com"
     full_name = "John Doe"
     date_of_birth = datetime.date.today()
     gender = "male"

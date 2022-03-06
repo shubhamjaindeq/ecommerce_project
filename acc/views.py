@@ -154,6 +154,10 @@ class ShopProfileView(DetailView):
     model = User
     template_name = 'shop/profile.html'
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
 class RequestsView(ListView):
     """collect all pending requests and show it to amdin"""
     model = User
@@ -312,11 +316,10 @@ class AddProductFormView(FormView):
 
     template_name = 'shop/addproduct.html'
     form_class = AddProduct
-    success_url = '/thanks/'
+    success_url = '/'
 
     def form_valid(self, form):
         """checks if the data is valid and then adds the product"""
-
         if self.request.user.role != "shopowner":
             return redirect("/accounts/logout")
         user_id = self.request.user.id
@@ -346,8 +349,6 @@ class ProductUpdateView(View):
 
         if request.user.role != "shopowner":
             return redirect("/accounts/logout")
-        print("product update  clalled")
-        print(self.kwargs)
         product_id = self.kwargs['pk']
         request_for = Product.objects.get(id=product_id)
         responsedata = {
@@ -366,11 +367,9 @@ class ProductUpdateView(View):
 
     def post(self, request , **kwargs):
         """gets called if the request method is post and data is updated"""
-
         if request.user.role != "shopowner":
             return redirect("/accounts/logout")
         data = request.POST
-        print(request.FILES['image'])
         name = data['name']
         product_id = kwargs['pk']
         category = data['category']
@@ -378,6 +377,7 @@ class ProductUpdateView(View):
         color = data['color']
         material = data['material']
         brand = data['brand']
+        price = data['price']
         description = data['description']
         product = Product.objects.get(id=product_id)
         product.category = category
@@ -387,6 +387,7 @@ class ProductUpdateView(View):
         product.color = color
         product.material = material
         product.brand = brand
+        product.price = price
         product.description = description
         product.save()
         return redirect("/listproducts/")
@@ -651,7 +652,6 @@ class ShopOrderView(ListView):
 
     def get_queryset(self):
         """fetch and prepare data for the view"""
-
         user = User.objects.get(id=self.request.user.id)
         items_list = OrderItems.objects.filter(provider = user)
         return items_list
@@ -667,8 +667,6 @@ class ItemStatusUpdateView(View):
 
         if request.user.role != "shopowner":
             return redirect("/accounts/logout")
-        print("product update  clalled")
-        print(self.kwargs)
         order_item = OrderItems.objects.get(id=self.kwargs['pk'])
         responsedata = {
         'id' : order_item.id,
