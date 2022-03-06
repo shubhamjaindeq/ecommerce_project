@@ -55,7 +55,7 @@ class IndexView(ListView):
             page_obj = paginator.get_page(page_number)
             return render(
                 request,self.template_name,
-                {'productlist': page_obj, 'productFilter' : productfilter }
+                {'productlist': page_obj, 'productFilter' : productfilter, 'products': productlist }
             )
 
         elif request.user.role == "shopowner":
@@ -409,11 +409,10 @@ class ProductDetailView(DetailView):
     """Handles My product view for customer"""
 
     model = Product
-    template_name = 'shop/productdetail.html'
+    template_name = 'customer/productdetail.html'
 
     def get_context_data(self, **kwargs):
         """prepares data for the product details"""
-
         product = kwargs['object']
         product.percentsale = product.soldcount * product.quantity / 100
         context = super().get_context_data(**kwargs)
@@ -439,6 +438,7 @@ class BuyNowView(View):
         orderitem.order = order
         orderitem.item = Product.objects.get(id=kwargs['pk'])
         orderitem.quantity = 1
+        orderitem.provider = Product.objects.get(id=kwargs['pk']).provider
         orderitem.total = Product.objects.get(id=kwargs['pk']).price
         orderitem.save()
         order.total = orderitem.total
@@ -471,14 +471,13 @@ class WishListView(View):
 
     def get(self, request, **kwargs):
         """fetches all items in wishlist"""
-
+        
         if request.user.role != "customer":
             return redirect("/accounts/logout")
         user_id = request.user.id
         user = User.objects.get(id = user_id)
         wishl = user.wishlist
         object_list = wishl.items.all()
-        print(user)
         return render(request, 'customer/mywishlist.html' , { 'object_list' : object_list })
 
 class DeleteFromWishListView(View):
@@ -524,9 +523,9 @@ class AddToCartView(View):
         else:
             cart = Cart(user=user)
             cart.save()
-            cartitems = CartItems(product , 1 , cart)
-            cartitems.product = product.id
-            cartitems.cart = cart.id
+            cartitems = CartItems(quantity = 1)
+            cartitems.product = product
+            cartitems.cart = cart
             cartitems.save()
         return redirect('/mycart/' + str(user.id))
 
@@ -541,8 +540,9 @@ class CartView(ListView):
 
         if self.request.user.role != "customer":
             return redirect("/accounts/logout")
-        print(self.request.user)
         user = self.request.user
+        if not hasattr(user, 'cart'):
+            return redirect("/")
         object_list = user.cart.cartitems_set.all()
         return object_list
 
@@ -617,7 +617,7 @@ class CancelOrderView(View):
         order = Order.objects.get(id = kwargs['pk'])
         order.status = "cancelled"
         order.save()
-        return redirect("/myorders")
+        return redirect("/myorders/")
 
 class OrderDetailView(DetailView):
     """renders detail view for order"""
@@ -640,7 +640,6 @@ class RemoveItemView(View):
         """process request for removal of an item"""
         orderitem = OrderItems.objects.get(id = kwargs['pk'])
         order_id = str(orderitem.order.id)
-        print(order_id)
         orderitem.delete()
         return redirect("/orderdetail/"+order_id)
 
