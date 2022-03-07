@@ -1,4 +1,5 @@
 """ORM models are defined maps databse to django views"""
+from sqlite3 import Timestamp
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
@@ -110,6 +111,11 @@ class User(AbstractBaseUser):
 class Category(models.Model):
 
     name = models.CharField(max_length=50)
+
+class Brand(models.Model):
+
+    name = models.CharField(max_length=50)
+
 class Product(models.Model):
     """Model for products listed by shops"""
     categories = (
@@ -119,21 +125,14 @@ class Product(models.Model):
     price = models.FloatField()
     name = models.CharField(max_length = 100)
     description = models.CharField(max_length = 500)
-    brand = models.CharField(max_length =50)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    soldcount = models.IntegerField(default=0)
     provider = models.ForeignKey(User , on_delete=models.CASCADE)
     image = models.ImageField(upload_to ='images/', default=None)
     color = models.CharField(max_length =20 , null=True, blank=True)
     material = models.CharField(max_length=50 , null=True , blank=True)
-    rating = models.IntegerField(
-        default=1,
-        validators=[
-            MaxValueValidator(100),
-            MinValueValidator(1)
-        ]
-    )
+    
 
     def __str__(self):
         """returns the name of product"""
@@ -148,6 +147,19 @@ class Product(models.Model):
         """check if the product is available"""
 
         return self.quantity > required
+class rating(models.Model):
+
+    value = models.IntegerField(
+        default=1,
+        validators=[
+            MaxValueValidator(100),
+            MinValueValidator(1)
+        ]
+    )
+
+    rated_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comment = models.TextField(default=None, null=True, blank=True)
 
 class Wishlist(models.Model):
     """Model to shortlist Products that you like"""
@@ -167,10 +179,15 @@ class CartItems(models.Model):
     quantity = models.IntegerField(default = 1)
     cart = models.ForeignKey(Cart , on_delete=models.CASCADE)
 
-class Order(models.Model):
+class TimeStamp(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+class Order(TimeStamp):
     """Creates a particular order for a user when he hits buy"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
     total = models.IntegerField()
     status = models.CharField(max_length=10)
 
@@ -182,5 +199,4 @@ class OrderItems(models.Model):
     item = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
     total = models.IntegerField()
-    provider = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     status = models.CharField(max_length=50, default = 'Waiting for delivery')

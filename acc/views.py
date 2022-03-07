@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from .filters import ProductFilter, SalesFilter
-from .models import User, Product, Wishlist, Cart, CartItems, Order, OrderItems
+from .models import User, Product, Wishlist, Cart, CartItems, Order, OrderItems , Brand, Category
 from .forms import RequestResponseForm, ShopSignupForm, AddUserForm,  AddProduct
 
 
@@ -75,7 +75,6 @@ class ApprovalView(View):
     @method_decorator([login_required])
     def get(self, request, **kwargs):
         """gets called if the request methods is get"""
-
         if request.user.role != "admin":
             return redirect("/accounts/logout/")
         user_id = kwargs['id']
@@ -212,6 +211,7 @@ class AddUserFormView(FormView):
         if self.request.user.role != "admin":
             return redirect("/accounts/logout")
         user = User()
+        print("in")
         user.email = form.cleaned_data['email']
         user.password = form.cleaned_data['password']
         user.set_password(form.cleaned_data['password'])
@@ -326,8 +326,13 @@ class AddProductFormView(FormView):
         product.price = form.cleaned_data['price']
         product.description = form.cleaned_data['description']
         product.image = form.cleaned_data['image']
-        product.brand = form.cleaned_data['brand']
-        product.category = form.cleaned_data['category']
+        category = Category(name="Electronics")
+        category.save()
+        brand = Brand(name="Bata")
+        brand.save()
+        product.category = category
+        product.brand = brand
+        product.category = category
         product.provider = user
         product.quantity = form.cleaned_data['quantity']
         product.color = form.cleaned_data['color']
@@ -352,8 +357,6 @@ class ProductUpdateView(View):
         'id' : request_for.id,
         'name': request_for.name,
         'price': request_for.price,
-        'category' : request_for.category,
-        'brand' : request_for.brand,
         'description' : request_for.description,
         'quantity': request_for.quantity,
         'image' : json.dumps(str(request_for.image)),
@@ -377,6 +380,10 @@ class ProductUpdateView(View):
         price = data['price']
         description = data['description']
         product = Product.objects.get(id=product_id)
+        category = Category(name="Electronics")
+        category.save()
+        brand = Brand(name="Bata")
+        brand.save()
         product.category = category
         product.name = name
         product.quantity = quantity
@@ -412,7 +419,7 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         """prepares data for the product details"""
         product = kwargs['object']
-        product.percentsale = product.soldcount * product.quantity / 100
+        product.percentsale = product.quantity * product.quantity / 100
         context = super().get_context_data(**kwargs)
         context['product'] = product
         return context
@@ -579,10 +586,8 @@ class CheckoutView(View):
             total = product.price * quantity
             total_price += total
             provider = item.product.provider
-            product.soldcount  += item.quantity
             orderitem = OrderItems(
                 order=order, item = product, quantity=quantity, total=total,
-                provider = provider
             )
             orderitem.save()
             product.save()
@@ -650,7 +655,7 @@ class ShopOrderView(ListView):
     def get_queryset(self):
         """fetch and prepare data for the view"""
         user = User.objects.get(id=self.request.user.id)
-        items_list = OrderItems.objects.filter(provider = user)
+        items_list = OrderItems.objects.filter(item__provider = user)
         return items_list
 
 class ItemStatusUpdateView(View):
@@ -695,7 +700,7 @@ class SalesReportView(ListView):
 
         user = User.objects.get(id=request.user.id)
         products = Product.objects.annotate(
-            percentsale = F("soldcount") * 100 / F("quantity")
+            percentsale = F("quantity") * 100 / F("quantity")
         ).filter(provider = user)
         productfilter = SalesFilter(request.GET, queryset=products)
         productlist = productfilter.qs

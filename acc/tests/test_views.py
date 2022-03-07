@@ -16,7 +16,7 @@ from allauth.account.admin import EmailAddress
 
 from acc.forms import AddProduct, RequestResponseForm
 from acc.views import AddProductFormView
-from . import user_factory, shop_factory, product_factory
+from . import user_factory, shop_factory, product_factory, category_factory, brand_factory
 from acc.models import User, Product, Wishlist, CartItems, Cart, Order, OrderItems
 
 class CustomerIndexViewsTest(TestCase): 
@@ -57,9 +57,16 @@ class CustomerIndexViewsTest(TestCase):
         shop.save()
         product = product_factory.ProductFactory.create()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
-        product = product_factory.ProductFactory.create(category = "accesories")
+        product = product_factory.ProductFactory.create(category = category)
         product.provider = shop
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password("shubham@1")
@@ -68,7 +75,7 @@ class CustomerIndexViewsTest(TestCase):
         response = self.client.get("/", { "sortby": "rhtl", "search": "latte" })
         self.assertQuerysetEqual(Product.objects.filter(name__icontains= "latte").order_by("rating"),  response.context['products'])
         response = self.client.get("/", { "category": "accesories", })
-        self.assertQuerysetEqual(Product.objects.filter(category="accesories"),  response.context['products'])
+        self.assertQuerysetEqual(Product.objects.filter(category=category),  response.context['products'], ordered = False)
 
 class CustomerProfileViewsTest(TestCase): 
     """test index page functioning for customer"""
@@ -137,6 +144,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
 
         response = self.client.get("/productdetail/{}".format(product.id))
@@ -150,6 +163,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -167,6 +186,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -175,6 +200,12 @@ class CustomerProductView(TestCase):
         self.client.get("/addtowishlist/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "cappucino")
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         self.client.get("/addtowishlist/{}".format(product.id))
         wishlist = Wishlist.objects.get(user=user)
@@ -187,6 +218,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -195,6 +232,12 @@ class CustomerProductView(TestCase):
         self.client.get("/addtowishlist/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "cappucino")
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         self.client.get("/addtowishlist/{}".format(product.id))
         response = self.client.get("/mywishlist/{}".format(user.id))
@@ -206,6 +249,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -223,6 +272,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -239,6 +294,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -248,6 +309,12 @@ class CustomerProductView(TestCase):
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 1)
         product = product_factory.ProductFactory.create(name = "Espresso")
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         response = self.client.get("/addtocart/{}".format(product.id))
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 2)
@@ -259,6 +326,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -274,6 +347,12 @@ class CustomerProductView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create()
         user.set_password(self.password1)
@@ -305,6 +384,12 @@ class CustomerBuyView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -314,6 +399,12 @@ class CustomerBuyView(TestCase):
         self.client.get("/addtocart/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "Espresso")
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         secondprice = product.price
 
@@ -329,6 +420,12 @@ class CustomerBuyView(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -363,6 +460,12 @@ class CustomerOrdersTest(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -381,6 +484,12 @@ class CustomerOrdersTest(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -401,6 +510,12 @@ class CustomerOrdersTest(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -420,6 +535,12 @@ class CustomerOrdersTest(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()
@@ -625,9 +746,21 @@ class ShopProductTest(TestCase):
         self.client.login(email = self.email, password = self.password1)
         product = product_factory.ProductFactory.create()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         product = product_factory.ProductFactory.create(name= "Shirt")
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         response = self.client.get("/listproducts/")
         self.assertTemplateUsed(response, template_name="shop/productlist.html")
@@ -643,6 +776,12 @@ class ShopProductTest(TestCase):
         self.client.login(email = self.email, password = self.password1)
         product = product_factory.ProductFactory.create()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         self.assertEqual(Product.objects.get(id=product.id).price, 100)
         response = self.client.get("/productupdate/{}".format(product.id))
@@ -674,6 +813,12 @@ class ShopProductTest(TestCase):
         self.client.login(email = self.email, password = self.password1)
         product = product_factory.ProductFactory.create()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         self.assertEqual(Product.objects.get(id=product.id), product)
         response = self.client.post("/deleteproduct/",{'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -706,6 +851,12 @@ class ShopOrderTest(TestCase):
         shop.set_password(self.password1)
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create(email = "taviba5898@xindax.com")
         user.set_password(self.password1)
@@ -715,7 +866,7 @@ class ShopOrderTest(TestCase):
         self.client.logout()
         c = self.client.login(email = shop.email, password = "shubham@1")
         response = self.client.get("/shoporder/")
-        self.assertQuerysetEqual(response.context['object_list'], OrderItems.objects.filter(provider = shop), ordered = False)
+        self.assertQuerysetEqual(response.context['object_list'], OrderItems.objects.filter(item__provider = shop), ordered = False)
 
     def test_order_status_update_view(self):
         """test status update for a order item by shop"""
@@ -724,6 +875,12 @@ class ShopOrderTest(TestCase):
         shop.set_password(self.password1)
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create(email = "taviba5898@xindax.com")
         user.set_password(self.password1)
@@ -736,7 +893,7 @@ class ShopOrderTest(TestCase):
         self.assertEqual(json.loads(response.content)['status'], "Waiting for delivery")
         response = self.client.post("/itemstatusupdate/{}".format(1), {"id": 1, "status": "Sent Out"})
         self.assertRedirects(response, "/listproducts/")
-        self.assertEqual(OrderItems.objects.get(provider = shop).status , "Sent Out")
+        self.assertEqual(OrderItems.objects.get(item__provider = shop).status , "Sent Out")
 
     def test_sales_report_view(self):
         """test to fetch sales report of products by shop"""
@@ -746,6 +903,12 @@ class ShopOrderTest(TestCase):
         shop.set_password(self.password1)
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         user = user_factory.UserFactory.create(email = "taviba5898@xindax.com")
         user.set_password(self.password1)
@@ -757,7 +920,7 @@ class ShopOrderTest(TestCase):
         response = self.client.get("/salesreport/")
         self.assertTemplateUsed(response, template_name="shop/salesreport.html")
         products = Product.objects.annotate(
-            percentsale = F("soldcount") * 100 / F("quantity")
+            percentsale = F("quantity") * 100 / F("quantity")
         ).filter(provider = shop)
         self.assertQuerysetEqual(response.context['productlist'], products, ordered=False)
 
@@ -799,6 +962,8 @@ class ApprovalTest(TestCase):
         self.gender = "M"
         self.password1 = "shubham@1"
         self.password2 = "shubham@1"
+        self.verifyurl = "/accounts/confirm-email/MQ:1nRATj:tcN5EBIkmoC9sAy1ZdNNgpYU4A_XgpcGqD5DiWNGEG8/"
+
 
     def test_approval_list_view(self):
 
@@ -822,7 +987,7 @@ class ApprovalTest(TestCase):
             'login': "yepin58022@toudrum.com",
             'password': self.password1,
         } )
-        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        self.client.post(self.verifyurl, data={})
         self.assertFalse(User.objects.get(email = "yepin58022@toudrum.com").is_active)
         self.client.login(email = self.email, password = self.password1)
         response = self.client.get("/requests/")
@@ -852,15 +1017,18 @@ class ApprovalTest(TestCase):
             'login': "yepin58022@toudrum.com",
             'password': self.password1,
         } )
-        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        self.client.post(self.verifyurl, data={})
+
         mail_to_admin = mail.outbox[1].body
+        print(mail_to_admin)
         self.client.login(email = self.email, password = self.password1)
         response = self.client.get(mail_to_admin)
+        print(response)
         self.assertTemplateUsed(response, template_name="requestresponse.html")
         self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
         response = self.client.get("/")
         self.request = response.wsgi_request
-        redirect_to = self.client.post("/approval/{}".format(2), {"response": "approve", "message": "approved"})
+        redirect_to = self.client.post("/approval/{}".format(2), {"action": "approve", "message": "approved"})
         self.assertRedirects(redirect_to, "/")
         self.assertTrue(User.objects.get(email = "yepin58022@toudrum.com").is_active)
 
@@ -887,7 +1055,7 @@ class ApprovalTest(TestCase):
             'login': "yepin58022@toudrum.com",
             'password': self.password1,
         } )
-        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        self.client.post(self.verifyurl, data={})
         mail_to_admin = mail.outbox[1].body
         self.client.login(email = self.email, password = self.password1)
         response = self.client.get(mail_to_admin)
@@ -895,7 +1063,7 @@ class ApprovalTest(TestCase):
         self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
         response = self.client.get("/")
         self.request = response.wsgi_request
-        redirect_to = self.client.post("/approval/{}".format(2), {"response": "reject", "message": "approved"})
+        redirect_to = self.client.post("/approval/{}".format(2), {"action": "reject", "message": "approved"})
         self.assertRedirects(redirect_to, "/")
         self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
 
@@ -926,30 +1094,6 @@ class ManageUserTest(TestCase):
         self.assertTemplateUsed(response, template_name = "userlist.html")
         self.assertQuerysetEqual(response.context['object_list'], User.objects.all(), ordered = False)
 
-    def test_add_shop(self):
-
-        data = { "email": "yepin58022@toudrum.com" ,
-                "full_name": "Dalton Tillman",
-                "address": "Esse excepturi illum do rerum minus nemo",
-                "date_of_birth_month": 5,
-                "date_of_birth_day": 21,
-                "date_of_birth_year": 2023,
-                "gender": "F",
-                "shopname": "Elmo Byers",
-                "shopaddress": "Placeat et perferendis laborum ex accusamus aliquid dolor commodo ab aliqua Consequatur nostrum tenetur possimus aut at enim",
-                "shopdesc": "Consectetur labore eum dolore nobis voluptas in nesciunt quia proident illum laboriosam",
-                "role": "shopowner",
-                "password1": "shubham@1",
-                "password2": "shubham@1"
-
-        }
-        
-        User.objects.create_superuser(email =  self.email, password = self.password1)
-        self.client.login(email = self.email, password = self.password1)
-        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
-        response = self.client.post("/adduser/", data)
-        self.assertRedirects(response, "/")
-        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 1)
 
     def test_user_orders_by_admin(self):
         shop = shop_factory.ShopFactory.create()
@@ -997,6 +1141,12 @@ class ManageOrdersandProductsTest(TestCase):
         shop = shop_factory.ShopFactory.create()
         shop.save()
         product.provider = shop
+        category = category_factory.CategoryFactory.create()
+        category.save()
+        brand = brand_factory.BrandFactory.create()
+        brand.save()
+        product.category = category
+        product.brand = brand
         product.save()
         price = product.price
         user = user_factory.UserFactory.create()

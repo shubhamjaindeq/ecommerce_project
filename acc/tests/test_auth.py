@@ -1,8 +1,8 @@
 """design and run tests for your appliaction"""
 import datetime
 
+from django.core import mail
 from django.test import TestCase, Client
-
 from allauth.account.admin import EmailAddress
 
 from acc.models import User
@@ -20,7 +20,7 @@ class CustomerAuthTest(TestCase):
         self.gender = "M"
         self.password1 = "shubham@1"
         self.password2 = "shubham@1"
-        self.verifyurl = "/accounts/confirm-email/MQ:1nPjV9:M8uIY2IvL3yFqt2XcCoYQkQx3j7vlF2ZhGuS2wCUDsE/"
+        self.verifyurl = "/accounts/confirm-email/MQ:1nRATj:tcN5EBIkmoC9sAy1ZdNNgpYU4A_XgpcGqD5DiWNGEG8/"
 
     def test_create_user_as_customer(self):
         user = User.objects.create_user(
@@ -88,9 +88,8 @@ class CustomerAuthTest(TestCase):
             "gender": self.gender,
             'password1': self.password1,
             'password2': self.password2,
-            "next" : "/",
         })
-        verify_response = self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        verify_response = self.client.post(self.verifyurl, data={})
         self.assertEqual(verify_response.status_code, 302)
         self.assertEqual(True, EmailAddress.objects.get(email = self.email).verified)
 
@@ -106,9 +105,8 @@ class CustomerAuthTest(TestCase):
             "gender": self.gender,
             'password1': self.password1,
             'password2': self.password2,
-            "next" : "/",
         })
-        verify_response = self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        verify_response = self.client.post(self.verifyurl, data={})
         login_response = self.client.get(verify_response.url)
         self.assertTemplateUsed(login_response, template_name="account/login.html")
         login_req = self.client.post("/accounts/login/", data = {
@@ -135,7 +133,7 @@ class CustomerAuthTest(TestCase):
             'password2': self.password2,
             "next" : "/",
         })
-        verify_response = self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        verify_response = self.client.post(self.verifyurl, data={})
         login_response = self.client.get(verify_response.url)
         self.assertTemplateUsed(login_response, template_name="account/login.html")
         login_req = self.client.post("/accounts/login/", data = {
@@ -190,7 +188,7 @@ class ShopAuthTest(TestCase):
         self.shopaddress = "Indore"
         self.password1 = "shubham@1"
         self.password2 = "shubham@1"
-        self.verifyurl = "/accounts/confirm-email/MQ:1nPjV9:M8uIY2IvL3yFqt2XcCoYQkQx3j7vlF2ZhGuS2wCUDsE/"
+        self.verifyurl = "/accounts/confirm-email/MQ:1nRATj:tcN5EBIkmoC9sAy1ZdNNgpYU4A_XgpcGqD5DiWNGEG8/"
 
     def test_create_user_as_shop(self):
         user = User.objects.create_user(
@@ -242,7 +240,7 @@ class ShopAuthTest(TestCase):
             'login': self.email,
             'password': self.password1,
         } )
-        verify_response = self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        verify_response = self.client.post(self.verifyurl, data={})
         self.assertFalse(User.objects.get(email = self.email).is_active)
         user = User.objects.get(email = self.email)
         user.is_active = True
@@ -271,7 +269,7 @@ class ShopAuthTest(TestCase):
             'login': self.email,
             'password': self.password1,
         } )
-        verify_response = self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        verify_response = self.client.post(self.verifyurl, data={})
         user = User.objects.get(email = self.email)
         user.is_active = True
         user.save()
