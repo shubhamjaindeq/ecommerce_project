@@ -84,12 +84,12 @@ class ApprovalView(View):
         return render(request , self.template_name , {'form' : form  , 'request_by' : request_by })
 
     def post(self, request, **kwargs):
-        """gets called if the request methods is get"""
+        """gets called if the request methods is post"""
 
         form = self.form_class(request.POST)
         if form.is_valid():
             #breakpoint()
-            approval_response = form.cleaned_data['response']
+            approval_response = form.cleaned_data['action']
             message = form.cleaned_data['message']
             user_id = kwargs['id']
             request_by = User.objects.get(id=user_id)
@@ -150,7 +150,7 @@ class UserProfileView(DetailView):
         return super().dispatch(*args, **kwargs)
 
 class ShopProfileView(DetailView):
-    """Handles My profile view for customer"""
+    """Handles My profile view for shop"""
     model = User
     template_name = 'shop/profile.html'
 
@@ -211,12 +211,10 @@ class AddUserFormView(FormView):
         """verify if the form data is valid and fetch attributes"""
         if self.request.user.role != "admin":
             return redirect("/accounts/logout")
-
-        print(form.cleaned_data)
         user = User()
         user.email = form.cleaned_data['email']
-        user.password = form.cleaned_data['password2']
-        user.set_password(form.cleaned_data['password2'])
+        user.password = form.cleaned_data['password']
+        user.set_password(form.cleaned_data['password'])
         user.role = form.cleaned_data['role']
         user.shopname = form.cleaned_data['shopname']
         user.shopdesc =form.cleaned_data['shopdesc']
@@ -291,7 +289,6 @@ class UserDeleteByAdmin(View):
             return redirect("/accounts/logout")
         data = json.loads(request.POST.get('data', ''))
         user_id = data['obj']['id']
-        print(id)
         request_by = User.objects.get(id=user_id)
         request_by.delete()
         return redirect("/listusers")
@@ -718,7 +715,6 @@ class UserOrderView(ListView):
             return redirect("/accounts/logout")
 
         orderlist = Order.objects.all()
-        print(orderlist)
         return render(
                 request, self.template_name,
                 { 'orderlist': orderlist }
@@ -801,3 +797,5 @@ class ProductListForAdminView(ListView):
                 self.request, self.template_name,
                 { 'productlist': productlist, 'salesFilter' : productfilter }
             )
+
+            

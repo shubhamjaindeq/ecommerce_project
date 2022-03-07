@@ -6,6 +6,7 @@ import tempfile             # for setting up tempdir for media
 from io import BytesIO 
 from urllib import response
 
+from django.core import mail
 from django.db.models import F
 from django.test import TestCase, Client
 from django.test import TestCase, override_settings
@@ -13,7 +14,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from allauth.account.admin import EmailAddress
 
-from acc.forms import AddProduct
+from acc.forms import AddProduct, RequestResponseForm
 from acc.views import AddProductFormView
 from . import user_factory, shop_factory, product_factory
 from acc.models import User, Product, Wishlist, CartItems, Cart, Order, OrderItems
@@ -760,7 +761,260 @@ class ShopOrderTest(TestCase):
         ).filter(provider = shop)
         self.assertQuerysetEqual(response.context['productlist'], products, ordered=False)
 
+class AdminIndexTest(TestCase):
 
+    def setUp(self):
+        """data preparation for test"""
 
+        self.client = Client()
+        self.email= "shujain@deqode.com"
+        self.full_name = "shubham jain"
+        self.address = "indore"
+        self.date_of_birth_month = 8
+        self.date_of_birth_day = 8
+        self.date_of_birth_year =  2027
+        self.gender = "M"
+        self.password1 = "shubham@1"
+        self.password2 = "shubham@1"
+
+    def test_landing_view(self):
+
+        admin = User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password2)
+        response = self.client.get("/")
+        self.assertTemplateUsed(response, template_name = "adminindex.html")
+    
+class ApprovalTest(TestCase):
+
+    def setUp(self):
+        """data preparation for test"""
+
+        self.client = Client()
+        self.email= "shujain@deqode.com"
+        self.full_name = "shubham jain"
+        self.address = "indore"
+        self.date_of_birth_month = 8
+        self.date_of_birth_day = 8
+        self.date_of_birth_year =  2027
+        self.gender = "M"
+        self.password1 = "shubham@1"
+        self.password2 = "shubham@1"
+
+    def test_approval_list_view(self):
+
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.post("/signupasshop/", data={
+            'email': "yepin58022@toudrum.com",
+            'full_name': self.full_name,
+            'address': self.address,
+            "date_of_birth_month": self.date_of_birth_month,
+            "date_of_birth_day": self.date_of_birth_day,
+            "date_of_birth_year": self.date_of_birth_year,
+            "gender": self.gender,
+            'password1': self.password1,
+            'password2': self.password2,
+            "next" : "/",
+            "shopname" : "BATA",
+            "shopaddress" : "Indore",
+            "shopdesc": "Shoe Shop",
+        })
+        self.client.post("/accounts/login/", data = {
+            'login': "yepin58022@toudrum.com",
+            'password': self.password1,
+        } )
+        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        self.assertFalse(User.objects.get(email = "yepin58022@toudrum.com").is_active)
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.get("/requests/")
+        self.assertTemplateUsed(response, template_name="requestlist.html")
+        self.assertQuerysetEqual(response.context['object_list'], User.objects.filter(is_active = False), ordered = False)
+        
+    def test_approval_accept_view(self):
+        """test to check id admin can approve or reject a request succesffully"""
+
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.post("/signupasshop/", data={
+            'email': "yepin58022@toudrum.com",
+            'full_name': self.full_name,
+            'address': self.address,
+            "date_of_birth_month": self.date_of_birth_month,
+            "date_of_birth_day": self.date_of_birth_day,
+            "date_of_birth_year": self.date_of_birth_year,
+            "gender": self.gender,
+            'password1': self.password1,
+            'password2': self.password2,
+            "next" : "/",
+            "shopname" : "BATA",
+            "shopaddress" : "Indore",
+            "shopdesc": "Shoe Shop",
+        })
+        self.client.post("/accounts/login/", data = {
+            'login': "yepin58022@toudrum.com",
+            'password': self.password1,
+        } )
+        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        mail_to_admin = mail.outbox[1].body
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.get(mail_to_admin)
+        self.assertTemplateUsed(response, template_name="requestresponse.html")
+        self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
+        response = self.client.get("/")
+        self.request = response.wsgi_request
+        redirect_to = self.client.post("/approval/{}".format(2), {"response": "approve", "message": "approved"})
+        self.assertRedirects(redirect_to, "/")
+        self.assertTrue(User.objects.get(email = "yepin58022@toudrum.com").is_active)
+
+    def test_approval_reject_view(self):
+        """test to check id admin can approve or reject a request succesffully"""
+
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.post("/signupasshop/", data={
+            'email': "yepin58022@toudrum.com",
+            'full_name': self.full_name,
+            'address': self.address,
+            "date_of_birth_month": self.date_of_birth_month,
+            "date_of_birth_day": self.date_of_birth_day,
+            "date_of_birth_year": self.date_of_birth_year,
+            "gender": self.gender,
+            'password1': self.password1,
+            'password2': self.password2,
+            "next" : "/",
+            "shopname" : "BATA",
+            "shopaddress" : "Indore",
+            "shopdesc": "Shoe Shop",
+        })
+        self.client.post("/accounts/login/", data = {
+            'login': "yepin58022@toudrum.com",
+            'password': self.password1,
+        } )
+        self.client.post("/accounts/confirm-email/MQ:1nQ1ZE:9WU3BqNn6oVaPzVQKBfX8LmqsnBZ9pO1K9lsr18tbGQ/", data={})
+        mail_to_admin = mail.outbox[1].body
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.get(mail_to_admin)
+        self.assertTemplateUsed(response, template_name="requestresponse.html")
+        self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
+        response = self.client.get("/")
+        self.request = response.wsgi_request
+        redirect_to = self.client.post("/approval/{}".format(2), {"response": "reject", "message": "approved"})
+        self.assertRedirects(redirect_to, "/")
+        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
+
+class ManageUserTest(TestCase):
+
+    def setUp(self):
+        """data preparation for test"""
+
+        self.client = Client()
+        self.email= "shujain@deqode.com"
+        self.full_name = "shubham jain"
+        self.address = "indore"
+        self.date_of_birth_month = 8
+        self.date_of_birth_day = 8
+        self.date_of_birth_year =  2027
+        self.gender = "M"
+        self.password1 = "shubham@1"
+        self.password2 = "shubham@1"
+
+    def test_list_users(self):
+
+        user = user_factory.UserFactory.create(email = "taviba5898@xindax.com")
+        user.set_password(self.password1)
+        user.save()
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.get("/listusers/")
+        self.assertTemplateUsed(response, template_name = "userlist.html")
+        self.assertQuerysetEqual(response.context['object_list'], User.objects.all(), ordered = False)
+
+    def test_add_shop(self):
+
+        data = { "email": "yepin58022@toudrum.com" ,
+                "full_name": "Dalton Tillman",
+                "address": "Esse excepturi illum do rerum minus nemo",
+                "date_of_birth_month": 5,
+                "date_of_birth_day": 21,
+                "date_of_birth_year": 2023,
+                "gender": "F",
+                "shopname": "Elmo Byers",
+                "shopaddress": "Placeat et perferendis laborum ex accusamus aliquid dolor commodo ab aliqua Consequatur nostrum tenetur possimus aut at enim",
+                "shopdesc": "Consectetur labore eum dolore nobis voluptas in nesciunt quia proident illum laboriosam",
+                "role": "shopowner",
+                "password1": "shubham@1",
+                "password2": "shubham@1"
+
+        }
+        
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password1)
+        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
+        response = self.client.post("/adduser/", data)
+        self.assertRedirects(response, "/")
+        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 1)
+
+    def test_user_orders_by_admin(self):
+        shop = shop_factory.ShopFactory.create()
+        shop.set_password(self.password1)
+        shop.save()
+        user = user_factory.UserFactory.create()
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password1)
+        self.assertEqual(User.objects.get(id=shop.id).full_name, "John Doe")
+        response = self.client.get("/userupdatebyadmin/{}".format(1))
+        self.assertEqual(json.loads(response.content)['full_name'], shop.full_name)
+        response = self.client.post("/userupdatebyadmin/",{'data': ['{"obj":{"address":"Bhopal", "full_name":"Shubham Jain","role":"shopowner","email":"yepin58022@toudrum.com", "id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertRedirects(response, "/")
+        self.assertEqual(User.objects.get(email= "yepin58022@toudrum.com").full_name, "Shubham Jain")
+
+    def test_user_delete_by_admin(self):
+        shop = shop_factory.ShopFactory.create()
+        shop.set_password(self.password1)
+        shop.save()
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.post("/userdeletebyadmin/",{'data': ['{"obj":{"id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.url, "/listusers")
+        self.assertEqual(len(User.objects.filter(email= "yepin58022@toudrum.com")), 0)
+
+class ManageOrdersandProductsTest(TestCase):
+
+    def setUp(self):
+        """data preparation for test"""
+
+        self.client = Client()
+        self.email= "shujain@deqode.com"
+        self.full_name = "shubham jain"
+        self.address = "indore"
+        self.date_of_birth_month = 8
+        self.date_of_birth_day = 8
+        self.date_of_birth_year =  2027
+        self.gender = "M"
+        self.password1 = "shubham@1"
+        self.password2 = "shubham@1"
+
+    def test_user_order_view(self):
+
+        product = product_factory.ProductFactory.create()
+        shop = shop_factory.ShopFactory.create()
+        shop.save()
+        product.provider = shop
+        product.save()
+        price = product.price
+        user = user_factory.UserFactory.create()
+        user.set_password(self.password1)
+        user.save()
+        self.client.login(email = "taviba5898@xindax.com", password = self.password1)
+        self.client.get("/buynow/{}".format(product.id))
+        User.objects.create_superuser(email =  self.email, password = self.password1)
+        self.client.login(email = self.email, password = self.password1)
+        response = self.client.get("/userorders")
+        self.assertTemplateUsed(response, template_name="userorders.html")
+        self.assertQuerysetEqual(response.context['orderlist'], Order.objects.all(), ordered = False)
 
         
+
+        
+
+
+
+
+

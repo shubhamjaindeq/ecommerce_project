@@ -1,24 +1,13 @@
 """module defines all the form used all ove the project"""
 from django import forms
-
+from django.forms import ModelForm
+from .models import Product
 from allauth.account.forms import SignupForm, LoginForm
 
 from .models import User
 
-
-class AdminUserUpdateForm(forms.Form):
-    """Form for admin to update user details"""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    full_name = forms.CharField(max_length=50)
-
-
-
 class CustomerSignupForm(SignupForm):
     """form for customer to sign up"""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     genderchoices = [
         ("M", "Male"),
@@ -31,18 +20,16 @@ class CustomerSignupForm(SignupForm):
         label='date_of_birth', widget=forms.SelectDateWidget,)
     gender = forms.ChoiceField(choices=genderchoices)
 
-    class Meta:
-        """meta attributes for this class"""
-        model = User
+    # class Meta:
+    #     """meta attributes for this class"""
+    #     model = User
 
     def save(self, request):
-        user = User()
+        user = super(CustomerSignupForm, self).save(request)
         user.role = "customer"
-        user.email = self.cleaned_data['email']
         user.full_name = self.cleaned_data['full_name']
         user.address = self.cleaned_data['address']
         user.gender = self.cleaned_data['gender']
-        user.set_password(self.cleaned_data['password1'])
         user.date_of_birth = self.cleaned_data['date_of_birth']
         user.save()
         return user
@@ -50,9 +37,6 @@ class CustomerSignupForm(SignupForm):
 
 class ShopSignupForm(SignupForm):
     """form for shop to sign up"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     genderchoices = [
         ("M", "Male"),
@@ -68,76 +52,37 @@ class ShopSignupForm(SignupForm):
     shopdesc = forms.CharField(max_length=500)
     role = "shopowner"
 
-    class Meta:
-        """meta attribute for this class"""
-        model = User
+    # class Meta:
+    #     """meta attribute for this class"""
+    #     model = User
 
 
-class AddUserForm(SignupForm):
+class AddUserForm(ModelForm):
     """form for shop to sign up"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    genderchoices = [
-        ("M", "Male"),
-        ("F", "Female")
-    ]
-    full_name = forms.CharField(max_length=50)
-    address = forms.CharField(max_length=100)
-    date_of_birth = forms.DateField(
-        label='date_of_birth', widget=forms.SelectDateWidget,)
-    gender = forms.ChoiceField(choices=genderchoices)
-    shopname = forms.CharField(max_length=50)
-    shopaddress = forms.CharField(max_length=200)
-    shopdesc = forms.CharField(max_length=500)
-    role = forms.CharField(max_length=50)
-
     class Meta:
         """meta attribute for this class"""
         model = User
-
-
-class UserLoginForm(LoginForm):
-    """form for user login"""
-
-    class Meta:
-        """meta attribtes"""
-        model = User
-
+        fields = "__all__"
+        exclude = ["last_login",]
 
 class RequestResponseForm(forms.Form):
     """Form for aadmin to approve or reject a shop registration"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
     choices = [
         ("approve", "approve"),
         ("reject", "reject")
     ]
 
-    class Meta:
-        """meta attribute for this class"""
-        model = User
-        fields = []
-
-    response = forms.ChoiceField(choices=choices)
+    action = forms.ChoiceField(choices=choices)
     message = forms.CharField(max_length=200)
 
-class AddProduct(forms.Form):
+class AddProduct(ModelForm):
     """Lets Shopowner add products"""
-    categories = (
-        ("electronics","electronics") , ("footwear","footwear") ,
-        ("accesories","accesories")
-    )
-    name = forms.CharField()
-    price = forms.IntegerField()
-    category = forms.ChoiceField(choices=categories)
-    description = forms.CharField()
-    image = forms.ImageField()
-    brand = forms.CharField()
-    quantity = forms.IntegerField()
-    color = forms.CharField()
-    material = forms.CharField()
+    
+    class Meta:
+         model = Product
+         fields = "__all__"
     

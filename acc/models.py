@@ -107,6 +107,9 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
+class Category(models.Model):
+
+    name = models.CharField(max_length=50)
 class Product(models.Model):
     """Model for products listed by shops"""
     categories = (
@@ -117,7 +120,7 @@ class Product(models.Model):
     name = models.CharField(max_length = 100)
     description = models.CharField(max_length = 500)
     brand = models.CharField(max_length =50)
-    category = models.CharField(choices = categories , max_length = 50)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     soldcount = models.IntegerField(default=0)
     provider = models.ForeignKey(User , on_delete=models.CASCADE)

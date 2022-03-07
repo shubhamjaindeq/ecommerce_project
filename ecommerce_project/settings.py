@@ -89,7 +89,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 REGISTRATION_ADMINS = ['shujain@deqode.com', ]
 ACCOUNT_FORMS = {
     'signup': 'acc.forms.CustomerSignupForm',
-    'login' : 'acc.forms.UserLoginForm',
+    #'login' : 'acc.forms.UserLoginForm',
 }
 REGISTRATION_FORM = 'acc.forms.CustomForm'
 MIDDLEWARE = [
