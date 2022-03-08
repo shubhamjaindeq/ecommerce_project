@@ -1,0 +1,167 @@
+{% extends 'shop/shopblankbody.html' %}
+{% block content %}
+
+
+<div class="card card-default">
+    <div class="card-header card-header-border-bottom">
+        <h2>Order Details</h2>
+    </div>
+    <div class="card-body">
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Item Number</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">total</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in object_list %}
+                
+                <tr>
+                    <td scope="row">{{item.id}}</td>
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>{{ item.status }}</td>
+                    
+                    </td>
+                    <td><button type="submit"  onClick="get_data('{{ item.id }}')" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Update Status
+                      </button></td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update Status</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form id="myForm" class="form-container">
+                {% csrf_token %}
+            
+        
+            
+            <label for="psw"><b>Status</b></label>
+            <input type="text"  id = form_status placeholder="Enter current Status" name="status" required>
+            <br>
+            <input type="hidden" id ="form_id" placeholder="Enter Email" name="id" required>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+<script>
+  $('#myForm').submit(function(e){
+    e.preventDefault();
+    console.log("submit called");
+    $form = $(this)
+    var formData = new FormData(this);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    var x = document.getElementById('form_id').value;
+    $.ajax({
+        url: `/itemstatusupdate/${x}`,
+        type: 'POST',
+        data: formData , 
+        success: function (response) {
+            $('.error').remove();
+            console.log(response)
+            if(response.error){
+                $.each(response.errors, function(name, error){
+                    error = '<small class="text-muted error">' + error + '</small>'
+                    $form.find('[name=' + name + ']').after(error);
+                })
+            }
+            else{
+                
+                window.location = ""
+            }
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+});
+
+
+function get_data(e){
+    document.getElementById("myForm").style.display = "block";
+
+    console.log("get data called")
+    $.ajax({
+        type: 'GET',
+        url: `/itemstatusupdate/${e}`,
+        data: {"id": e},
+        success: function (response) {
+            console.log("reached");
+            console.log(response)
+            document.getElementById("form_status").value = response.status;
+            document.getElementById("form_id").value = response.id;
+        },
+        error: function (response) {
+            console.log(response)
+        }
+    })
+}
+
+function update(e){
+    
+    console.log(e)
+    formis = document.getElementById("myForm")
+    console.log(e)
+    updated_data = {
+    'name' : document.getElementById("form_name").value ,
+    'price': document.getElementById("form_price").value ,
+    'category' : document.getElementById("form_category").value ,
+    'brand' : document.getElementById("form_brand").value,
+    'id' : document.getElementById("form_id").value,
+    'description' : document.getElementById("form_description").value,
+    'brand': document.getElementById("forn_brand").value,
+    'quantity': document.getElementById("form_quantity").value,
+
+
+    'data': {
+        'content': 'xxx',
+        'csrfmiddlewaretoken': '{{ csrf_token }}',
+    },
+}
+$.ajax({
+        type: 'POST',
+        url: '/userupdatebyadmin/',
+        data: {'data': JSON.stringify({'obj': updated_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+        success: function (response) {
+            // if not valid user, alert the user
+            console.log(response)
+        },
+        error: function (response) {
+            console.log(response)
+        }
+    })
+
+}  
+
+    
+
+</script>
+
+{% endblock %}

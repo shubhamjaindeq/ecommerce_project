@@ -1,0 +1,185 @@
+{% extends 'adminblankbody.html' %}
+{% block content %}
+
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+<a href ="/acc/adduser" > <button class= "mb-1 btn  disabled btn-success" > Add Shop</button></a>
+<br>
+    <thead>
+        
+        <th>ID</th>
+        <th>Email</th>
+        <th>Full_name</th>
+        <th>Address</th>
+        <th>gender</th>
+        <th>Role</th>
+        
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in object_list %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.email }}</td>
+            <td>{{ obj.full_name }}</td>
+            <td>{{ obj.address }}</td>
+            <td>{{ obj.gender }}</td>
+            <td>{{ obj.role }}</td>
+                <td><button type="button" class="btn btn-primary" onClick="get_data('{{ obj.id }}')" data-toggle="modal" data-target="#exampleModalLong">
+                    Update
+                  </button></td>
+                <td><button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
+                Delete
+              </button></td>
+            
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Are you sure you want to delete this user?</h5>
+          <input type="hidden" id ="second_form_id" placeholder="Enter Email" name="email" required>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+       
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">No </button>
+          <button type="button"  onclick="confirm_delete()" class="btn btn-primary">Confirm delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Update User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="#" id="myForm" class="form-container">
+          
+      
+          <label for="email"><b>Email</b></label>
+          <input type="email" id = "form_email" placeholder="Enter Email" name="email" required>
+          <br>
+          
+          <input type="hidden" id ="form_id" placeholder="Enter Email" name="email" required>
+          <br>
+          <label for="psw"><b>Fullname</b></label>
+          <input type="text"  id="form_name" placeholder="Enter Password" name="psw" required>
+          <br>
+          <label for="psw"><b>address</b></label>
+          <input type="text" id="form_address" placeholder="Enter Password" name="psw" required>
+          <br>
+          <label for="psw"><b>role</b></label>
+          <input type="text"  id = form_role placeholder="Enter Password" name="psw" required>
+          <br>
+          
+          
+        </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onClick="update()" >Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    
+    function get_data(e){
+        document.getElementById("myForm").style.display = "block";
+        $.ajax({
+            type: 'GET',
+            url: `/userupdatebyadmin/${e}`,
+            data: {"id": e},
+            success: function (response) {
+                document.getElementById("form_name").value = response.full_name;
+                document.getElementById("form_address").value = response.address;
+                document.getElementById("form_role").value = response.role;
+                document.getElementById("form_email").value = response.email;
+                document.getElementById("form_id").value = response.id;
+            },
+            error: function (response) {
+                console.log("error occured")
+            }
+        })
+    }
+  
+   
+    function update(e){
+        
+        formis = document.getElementById("myForm")
+        updated_data = {
+        'address' : document.getElementById("form_address").value ,
+        'full_name': document.getElementById("form_name").value ,
+        'role' : document.getElementById("form_role").value ,
+        'email' : document.getElementById("form_email").value,
+        'id' : document.getElementById("form_id").value,
+        'data': {
+            'content': 'xxx',
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+    }
+    $.ajax({
+            type: 'POST',
+            url: '/userupdatebyadmin/',
+            data: {'data': JSON.stringify({'obj': updated_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function (response) {
+                
+            },
+            error: function (response) {
+            }
+        })
+ 
+    }  
+    function delete_data(e){
+        document.getElementById("second_form_id").value = e;        
+    }  
+    function confirm_delete(){
+        id = document.getElementById("second_form_id").value
+        delete_data = {
+            'id' : id,
+            'data': {
+            'content': 'xxx',
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/userdeletebyadmin/',
+            data: {'data': JSON.stringify({'obj': delete_data}) , 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function (response) {
+                // if not valid user, alert the user
+            },
+            error: function (response) {
+                console.log("error")
+            }
+        })
+
+        
+    }
+</script>
+
+{% endblock %}
+
+

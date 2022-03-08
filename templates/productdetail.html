@@ -1,0 +1,114 @@
+{% extends "adminblankbody.html" %}
+{% block content %}
+<p>this is admin</p>
+<html>
+    <head>
+        <title>Product detail</title>
+    </head>
+<div class="container">
+    <div class="main-body">
+    
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb" class="main-breadcrumb">
+         
+          </nav>
+          <!-- /Breadcrumb -->
+    
+          <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <div class="mt-3">
+                        <img src="{{ product.image }}" alt="">
+                      <h4>{{product.name}}</h4>
+                      <br>
+                      <img class="card-img-top" src="{{product.image.url}}">
+                      <p class="text-muted font-size-sm">{{ product.provider.email }}</p>
+                      <p class="text-muted font-size-sm">{{ product.provider }}</p>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card mt-3">
+                <ul class="list-group list-group-flush">
+                  
+                  
+               
+                </ul>
+              </div>
+            </div>
+            <hr>
+            <hr>
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Price</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ product.price }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Description</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ product.description }}
+                    </div>
+                  </div>
+                  
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Brand</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ product.brand }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">percent sale</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ product.percentsale }} %
+                    </div>
+                  </div>
+                  
+                  <hr>
+                  
+                </div>
+              </div>
+              <div class="col-xl-12 col-sm-12 col-lg-12 "  >
+                <div class="card card-mini  mb-4">
+                  <div class="card-body">
+                    <h2 class="mb-1">{{ product.soldcount }}</h2>
+                    <p>Total Sales</p>
+                    <div class="chartjs-wrapper">
+                      <canvas id="dual-line"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              
+              
+              
+              
+            </div>
+            
+          </div>
+          
+        </div>
+    </div>
+
+   
+{% endblock %}
+
+</html>

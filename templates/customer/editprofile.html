@@ -1,0 +1,39 @@
+{% extends "customer/customerblankbody.html" %}
+{% load myfilters %}
+{% block content %}
+<div class="container py-5">
+    <!-- For demo purpose -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-6">Update Details</h1>
+        </div>
+    </div> <!-- End -->
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card ">
+                <div class="card-header">
+                     <!-- End -->
+                    <!-- Credit card form content -->
+                    <div class="tab-content">
+                       
+                        <!-- credit card info-->
+                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                            <form method="POST">
+                                {% csrf_token %}
+                
+                                {{form.as_ul}}
+                                
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                       
+                                    </div>
+                                   
+                                </div>
+                                <div class="card-footer"> <button type="submit" class="subscribe btn btn-primary btn-block shadow-sm"> Update </button>
+                            </form>
+                        </div>
+                    </div> <!-- End -->
+                    
+ 
+{% endblock %}

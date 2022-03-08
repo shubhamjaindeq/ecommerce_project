@@ -1,0 +1,47 @@
+{% extends 'adminblankbody.html' %}
+{% block content %}
+
+
+<table id = "myTable" width = "100%" > 
+    <br>  
+
+<br>
+    <thead>
+        
+        <th>ID</th>
+        <th>By</th>
+        <th>total</th>
+        <th>Status</th>
+        <th>Date</th>
+ 
+        
+
+    </thead>
+    
+    <tbody  id = "myTbody">
+        {% for obj in orderlist %}
+        <tr>
+            <td>{{ obj.id }}</td>
+            <td>{{ obj.user }}</td>
+            <td>{{ obj.total }}</td>
+            <td>{{ obj.status }}</td>
+            <td>{{ obj.date }}</td>
+            
+                
+                <td> <a href="/order/orderdetailforadmin/{{obj.id}}"> <button type="button" class="btn btn-primary" data-toggle="modal" onclick ="delete_data('{{ obj.id }}')" data-target="#exampleModalCenter">
+                Details
+              </button> </a> </td>
+            
+            
+        </tr>
+        {% endfor %}
+        
+        
+    </tbody>
+    
+</table>
+
+
+{% endblock %}
+
+

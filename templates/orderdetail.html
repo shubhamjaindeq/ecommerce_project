@@ -1,0 +1,86 @@
+{% extends 'adminblankbody.html' %}
+{% block content %}
+
+<div class="container">
+
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Order Id</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ object.id }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Date</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ object.date }}
+                    </div>
+                  </div>
+                  
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">By</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{ object.user }}
+                    </div>
+                  </div>
+                  
+                  <hr>
+                 
+                </div>
+              </div>
+
+
+
+
+        </div>
+    </div>
+<div class="card card-default">
+    <div class="card-header card-header-border-bottom">
+        <h2>Order Details</h2>
+    </div>
+    <div class="card-body">
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Item Number</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">total</th>
+                    <th scope="col">Status</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items_list %}
+                
+                
+                <tr>
+                    <td scope="row">{{item.id}}</td>
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>{{ item.status }}</td>
+                    
+                    <td> <a href="/product/productdetailforadmin/{{item.item.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                        product detail
+                      </button></a>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -11,15 +11,13 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 import environ
 
 env = environ.Env()
 environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -29,8 +27,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -45,42 +42,59 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'acc'
+    'acc',
+    'dashboard',
+    'product',
+    'order',
+    'dajaxice',
+    'dajax',
+    'django_filters',
 ]
 
+
+TEMPLATE_LOADERS = (
+   'django.template.loaders.filesystem.Loader',
+   'django.template.loaders.app_directories.Loader',
+   'django.template.loaders.eggs.Loader',
+)
+TEMPLATE_CONTEXT_PROCESSORS = (
+   'django.contrib.auth.context_processors.auth',
+   'django.core.context_processors.debug',
+   'django.core.context_processors.i18n',
+   'django.core.context_processors.media',
+   'django.core.context_processors.static',
+   'django.core.context_processors.request',
+   'django.contrib.messages.context_processors.messages'
+)
 SITE_ID = 1
-SOCIALACCOUNT_PROVIDERS = {
-   
-    
-}   
+SOCIALACCOUNT_PROVIDERS = {}
 AUTHENTICATION_BACKENDS = [
-    
-    
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-    
 ]
-AUTH_USER_MODEL = 'acc.Myuser'  
+AUTH_USER_MODEL = 'acc.User'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGOUT_REDIRECT_URL ="/accounts/login"
 ACCOUNT_AUTHENTICATION_METHOD = ("email")
 ACCOUNT_EMAIL_VERIFICATION = ("mandatory")
-LOGIN_REDIRECT_URL = '/acc/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'codetestbyshubham@gmail.com'
-EMAIL_HOST_PASSWORD = 'shubham@1'
+EMAIL_HOST_USER = env('HOST_USER')
+EMAIL_HOST_PASSWORD = env('HOST_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+REGISTRATION_ADMINS = ['shujain@deqode.com', ]
 ACCOUNT_FORMS = {
-'signup': 'acc.forms.MySignupForm',
+    'signup': 'acc.forms.CustomerSignupForm',
+    #'login' : 'acc.forms.UserLoginForm',
 }
-
+REGISTRATION_FORM = 'acc.forms.CustomForm'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -96,7 +110,7 @@ ROOT_URLCONF = 'ecommerce_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,24 +129,15 @@ WSGI_APPLICATION = 'ecommerce_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'ecommerce_db',
-#         'HOST': 'localhost' , 
-#         'USER': 'postgres' ,
-#         'PASSWORD': 'root',
-#         'PORT': ""
-#     }
-# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('DATABASE_NAME'),
-        'HOST': env('DATABASE_HOST'), 
-        'USER': env('DATABASE_USER') ,
-        'PASSWORD': env('DATABASE_PASS'),
-        'PORT': ""
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3'
+        # 'HOST': env('DATABASE_HOST'),
+        # 'USER': env('DATABASE_USER'),
+        # 'PASSWORD': env('DATABASE_PASS'),
+        # 'PORT': ""
     }
 }
 
@@ -167,11 +172,23 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
+# breakpoint()
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+STATICFILES_FINDERS = (
+   'django.contrib.staticfiles.finders.FileSystemFinder',
+   'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+   'dajaxice.finders.DajaxiceFinder',
+)
 
-STATIC_URL = 'static/'
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

@@ -1,0 +1,24 @@
+{% extends 'baseblankbody.html' %}
+{% block profilelink %}
+<a href="/acc/shopprofile/{{user.id}}">
+  <i class="mdi mdi-account"></i> My Profile
+</a>
+{% endblock %}
+{% block allproducts %}
+<a href="/product/listproducts/">
+  <i class="mdi mdi-account"></i> My Products
+</a>
+{% endblock %}
+{% block content %}
+  <p>shop content here</p>
+{% endblock %}
+{% block salesreport %}
+<a href="/acc/salesreport/">
+  <i class="mdi mdi-account"></i> Sales report
+</a>
+{% endblock %}
+{% block shoporder %}
+<a href="/order/shoporder/">
+  <i class="mdi mdi-account"></i> Shop order
+</a>
+{% endblock %}
