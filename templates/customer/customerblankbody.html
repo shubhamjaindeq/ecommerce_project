@@ -1,6 +1,6 @@
 {% extends 'baseblankbody.html' %}
 {% block profilelink %}
-<a href="/userprofile/{{user.id}}">
+<a href="/acc/userprofile/{{user.id}}">
   <i class="mdi mdi-account"></i> My Profile
 </a>
 {% endblock %}
@@ -8,17 +8,17 @@
   <p>customer content here</p>
 {% endblock %}
 {% block mywishlist %}
-<a href="/mywishlist/{{user.id}}">
+<a href="/product/mywishlist/{{user.id}}">
     <i class="mdi mdi-account"></i> My Wishlist
   </a>
 {% endblock %}
 {% block mycart %}
-<a href="/mycart/{{user.id}}">
+<a href="/order/mycart/{{user.id}}">
     <i class="mdi mdi-account"></i> My Cart
   </a>
 {% endblock %}
 {% block myorders %}
-<a href="/myorders/">
+<a href="/order/myorders/">
   <i class="mdi mdi-account"></i> My Orders
 </a>
 {% endblock %}

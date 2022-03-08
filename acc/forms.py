@@ -1,7 +1,7 @@
 """module defines all the form used all ove the project"""
 from django import forms
 from django.forms import ModelForm
-from .models import Product
+from product.models import Product
 from allauth.account.forms import SignupForm, LoginForm
 
 from .models import User
@@ -79,10 +79,10 @@ class RequestResponseForm(forms.Form):
     action = forms.ChoiceField(choices=choices)
     message = forms.CharField(max_length=200)
 
-class AddProduct(ModelForm):
-    """Lets Shopowner add products"""
+# class AddProduct(ModelForm):
+#     """Lets Shopowner add products"""
     
-    class Meta:
-         model = Product
-         fields = "__all__"
+#     class Meta:
+#          model = Product
+#          fields = "__all__"
     

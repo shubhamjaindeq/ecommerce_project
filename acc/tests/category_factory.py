@@ -1,7 +1,7 @@
 import factory
 import datetime
 
-from acc.models import Category
+from product.models import Category
 
 class CategoryFactory(factory.Factory): 
 

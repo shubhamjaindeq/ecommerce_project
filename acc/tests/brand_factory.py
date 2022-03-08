@@ -1,7 +1,7 @@
 import factory
 import datetime
 
-from acc.models import Brand
+from product.models import Brand
 
 class BrandFactory(factory.Factory): 
 

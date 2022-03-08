@@ -208,7 +208,7 @@ class ShopAuthTest(TestCase):
         self.assertEqual(user.shopname, self.shopname)
 
     def test_signup_page_url(self):
-        response = self.client.get("/signupasshop/")
+        response = self.client.get("/acc/signupasshop/")
         self.assertTemplateUsed(response, template_name="account/shopsignup.html")
 
     def test_signup_as_shop(self):
@@ -221,7 +221,7 @@ class ShopAuthTest(TestCase):
             role = "admin",
             password = "root",
         )
-        response = self.client.post("/signupasshop/", data={
+        response = self.client.post("/acc/signupasshop/", data={
             'email': self.email,
             'full_name': self.full_name,
             'address': self.address,
@@ -250,7 +250,7 @@ class ShopAuthTest(TestCase):
 
     def test_login(self):
 
-        self.client.post("/signupasshop/", data={
+        self.client.post("/acc/signupasshop/", data={
             'email': self.email,
             'full_name': self.full_name,
             'address': self.address,

@@ -16,6 +16,6 @@ def email_confirmed_(email_address, **kwargs):
     if user.role == "shopowner":
         user.is_active = False
         user.save()
-        messagestring = "http://127.0.0.1:8000/approval/" + str(user.id)
+        messagestring = "http://127.0.0.1:8000/acc/approval/" + str(user.id)
         send_mail("hi This person wants to register", messagestring,
         "codetestbyshubham@gmail.com",["shujain@deqode.com"])

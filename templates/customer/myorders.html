@@ -25,10 +25,10 @@
                     <td>{{ order.date }}</td>
                     <td>{{ order.total }}</td>
                     <td>{{ order.status }}</td>
-                    <td> <a href="/orderdetail/{{order.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                    <td> <a href="/order/orderdetail/{{order.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
                         Details
                       </button></a>
-                    <td> <a href="/cancelorder/{{order.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                    <td> <a href="/order/cancelorder/{{order.id}}" ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
                         Cancel Order
                       </button></a>
                     </td>

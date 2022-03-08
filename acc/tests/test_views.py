@@ -1,4 +1,5 @@
 import json
+import time
 import factory
 import datetime
 import base64               # for decoding base64 image
@@ -14,10 +15,13 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from allauth.account.admin import EmailAddress
 
-from acc.forms import AddProduct, RequestResponseForm
-from acc.views import AddProductFormView
+from acc.forms import RequestResponseForm
+from product.forms import AddProduct
+from product.views import AddProductFormView
 from . import user_factory, shop_factory, product_factory, category_factory, brand_factory
-from acc.models import User, Product, Wishlist, CartItems, Cart, Order, OrderItems
+from acc.models import User
+from product.models import Product, Wishlist
+from order.models import CartItems, Cart, Order, OrderItems
 
 class CustomerIndexViewsTest(TestCase): 
     """test index page functioning for customer"""
@@ -37,9 +41,9 @@ class CustomerIndexViewsTest(TestCase):
 
     def test_landing_without_login(self):
         """test to check if the app redirects to login when user isnt logged in"""
-        redirection = self.client.get("/")
+        redirection = self.client.get("/dashboard/")
         self.assertTemplateNotUsed(redirection, template_name="customer/customerindex.html")
-        self.assertRedirects(redirection, "/accounts/login/?next=/")
+        self.assertRedirects(redirection, "/accounts/login/?next=/dashboard/")
     
     def test_landing(self):
         """tests login for an authenticated user"""
@@ -47,7 +51,7 @@ class CustomerIndexViewsTest(TestCase):
         user.set_password("shubham@1")
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        landing = self.client.get("/")
+        landing = self.client.get("/dashboard/")
         self.assertTemplateUsed(landing, template_name="customer/customerindex.html")
 
     def test_search_and_filter_landing(self):
@@ -72,9 +76,10 @@ class CustomerIndexViewsTest(TestCase):
         user.set_password("shubham@1")
         user.save()
         self.client.login(email=user.email, password= self.password1)
-        response = self.client.get("/", { "sortby": "rhtl", "search": "latte" })
+        response = self.client.get("/dashboard/", { "sortby": "rhtl", "search": "latte" })
         self.assertQuerysetEqual(Product.objects.filter(name__icontains= "latte").order_by("rating"),  response.context['products'])
-        response = self.client.get("/", { "category": "accesories", })
+        response = self.client.get("/dashboard/", { "category": category, })
+
         self.assertQuerysetEqual(Product.objects.filter(category=category),  response.context['products'], ordered = False)
 
 class CustomerProfileViewsTest(TestCase): 
@@ -100,7 +105,7 @@ class CustomerProfileViewsTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/userprofile/{}".format(user.id))
+        response = self.client.get("/acc/userprofile/{}".format(user.id))
         self.assertEqual(response.context['object'], user)
         self.assertTemplateUsed(response , template_name="customer/profile.html")
 
@@ -110,9 +115,9 @@ class CustomerProfileViewsTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/edituserdetails/{}".format(user.id))
+        response = self.client.get("/acc/edituserdetails/{}".format(user.id))
         self.assertTemplateUsed(response, template_name="customer/editprofile.html")
-        response = self.client.post("/edituserdetails/{}".format(user.id), {
+        response = self.client.post("/acc/edituserdetails/{}".format(user.id), {
             "full_name": "shubham jain", 
             "email": self.email,
             "address": self.address,
@@ -120,7 +125,7 @@ class CustomerProfileViewsTest(TestCase):
             }
         ) 
         self.assertEqual(User.objects.get(email = self.email).full_name, "shubham jain")
-        self.assertEqual("/", response.url)
+        self.assertEqual("/dashboard", response.url)
 
 class CustomerProductView(TestCase):
     """tests for customers interaction with products"""
@@ -151,8 +156,7 @@ class CustomerProductView(TestCase):
         product.category = category
         product.brand = brand
         product.save()
-
-        response = self.client.get("/productdetail/{}".format(product.id))
+        response = self.client.get("/product/productdetail/{}".format(product.id))
         self.assertTemplateUsed(response, template_name="customer/productdetail.html")
         self.assertEqual(product, response.context['product'])
 
@@ -174,8 +178,8 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/addtowishlist/{}".format(product.id))
-        self.assertEqual(response.url, "/")
+        response = self.client.get("/product/addtowishlist/{}".format(product.id))
+        self.assertEqual(response.url, "/dashboard")
         wishlist = Wishlist.objects.get(user = user)
         self.assertEqual(wishlist.items.all()[0], product)
 
@@ -197,7 +201,7 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/addtowishlist/{}".format(product.id))
+        self.client.get("/product/addtowishlist/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "cappucino")
         product.provider = shop
         category = category_factory.CategoryFactory.create()
@@ -207,7 +211,7 @@ class CustomerProductView(TestCase):
         product.category = category
         product.brand = brand
         product.save()
-        self.client.get("/addtowishlist/{}".format(product.id))
+        self.client.get("/product/addtowishlist/{}".format(product.id))
         wishlist = Wishlist.objects.get(user=user)
         self.assertEqual(len(wishlist.items.all()), 2)
 
@@ -229,7 +233,7 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/addtowishlist/{}".format(product.id))
+        self.client.get("/product/addtowishlist/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "cappucino")
         product.provider = shop
         category = category_factory.CategoryFactory.create()
@@ -239,8 +243,8 @@ class CustomerProductView(TestCase):
         product.category = category
         product.brand = brand
         product.save()
-        self.client.get("/addtowishlist/{}".format(product.id))
-        response = self.client.get("/mywishlist/{}".format(user.id))
+        self.client.get("/product/addtowishlist/{}".format(product.id))
+        response = self.client.get("/product/mywishlist/{}".format(user.id))
         #self.assertEqual(Wishlist.objects.get(user = user).items.all(), response.context['object_list'])
         self.assertTemplateUsed(response, template_name="customer/mywishlist.html")
 
@@ -260,10 +264,10 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/addtowishlist/{}".format(product.id))   
-        response = self.client.post("/deletefromwishlist/",{'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        redirected_to = self.client.get(response.url)
-        self.assertTemplateUsed(redirected_to, template_name="customer/mywishlist.html")
+        self.client.get("/product/addtowishlist/{}".format(product.id))   
+        response = self.client.post("/product/deletefromwishlist/",{'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        redirected_to = response.url
+        self.assertRedirects(response, "/product/mywishlist/{}".format(user.id))
         self.assertEqual(len(Wishlist.objects.get(user = user).items.all()), 0)
 
     def test_add_to_cart_first_time(self):
@@ -284,8 +288,8 @@ class CustomerProductView(TestCase):
         user.save()
         self.client.login(email = self.email, password = self.password1)
         self.assertEqual(len(Cart.objects.filter(user=user)), 0)
-        response = self.client.get("/addtocart/{}".format(product.id))
-        self.assertEqual(response.url, "/mycart/{}".format(user.id))
+        response = self.client.get("/order/addtocart/{}".format(product.id))
+        self.assertEqual(response.url, "/order/mycart/{}".format(user.id))
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 1)
 
     def test_addtocart_with_existing_cart(self):
@@ -305,7 +309,7 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/addtocart/{}".format(product.id))
+        response = self.client.get("/order/addtocart/{}".format(product.id))
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 1)
         product = product_factory.ProductFactory.create(name = "Espresso")
         product.provider = shop
@@ -316,7 +320,7 @@ class CustomerProductView(TestCase):
         product.category = category
         product.brand = brand
         product.save()
-        response = self.client.get("/addtocart/{}".format(product.id))
+        response = self.client.get("/order/addtocart/{}".format(product.id))
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 2)
 
     def test_cart_view(self):
@@ -337,7 +341,7 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/mycart/{}".format(user.id))
+        response = self.client.get("/order/mycart/{}".format(user.id))
         self.assertTemplateUsed(response, template_name="customer/mycart.html")
 
     def test_delete_from_cart_view(self):
@@ -358,9 +362,9 @@ class CustomerProductView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/addtocart/{}".format(product.id))
+        self.client.get("/order/addtocart/{}".format(product.id))
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 1)
-        self.client.post("/deletefromcart/", {'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']},  HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.post("/order/deletefromcart/", {'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']},  HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(len(Cart.objects.get(user=user).cartitems_set.all()), 0)
 
 class CustomerBuyView(TestCase):
@@ -396,7 +400,7 @@ class CustomerBuyView(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/addtocart/{}".format(product.id))
+        self.client.get("/order/addtocart/{}".format(product.id))
         product = product_factory.ProductFactory.create(name = "Espresso")
         product.provider = shop
         category = category_factory.CategoryFactory.create()
@@ -408,8 +412,8 @@ class CustomerBuyView(TestCase):
         product.save()
         secondprice = product.price
 
-        self.client.get("/addtocart/{}".format(product.id))
-        response = self.client.get("/checkout/")
+        self.client.get("/order/addtocart/{}".format(product.id))
+        response = self.client.get("/order/checkout/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Cart.objects.filter(user=user)[0].cartitems_set.all()), 0)
         self.assertEqual(Order.objects.filter(user=user)[0].total, price+secondprice)
@@ -433,7 +437,7 @@ class CustomerBuyView(TestCase):
         user.save()
         self.client.login(email = self.email, password = self.password1)
         self.assertEqual(len(Order.objects.filter(user=user)), 0)
-        response = self.client.get("/buynow/{}".format(product.id))
+        response = self.client.get("/order/buynow/{}".format(product.id))
         self.assertEqual(len(Order.objects.filter(user=user)), 1)
 
             
@@ -472,8 +476,8 @@ class CustomerOrdersTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
-        response = self.client.get("/myorders/")
+        self.client.get("/order/buynow/{}".format(product.id))
+        response = self.client.get("/order/myorders/")
         self.assertTemplateUsed(response, template_name="customer/myorders.html")
         self.assertQuerysetEqual(response.context['object_list'], Order.objects.filter(user=user), ordered = False)
 
@@ -496,11 +500,11 @@ class CustomerOrdersTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         order = Order.objects.filter(user=user)[0]
         self.assertEquals(order.status, "paid")
-        response = self.client.get("/cancelorder/{}".format(order.id))
-        self.assertRedirects(response, "/myorders/")
+        response = self.client.get("/order/cancelorder/{}".format(order.id))
+        self.assertRedirects(response, "/order/myorders/")
         self.assertEquals(Order.objects.get(id=order.id).status, "cancelled")
 
     def test_detail_order_view(self):
@@ -522,13 +526,13 @@ class CustomerOrdersTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         order = Order.objects.filter(user=user)[0]
-        response = self.client.get("/orderdetail/{}".format(order.id))
+        response = self.client.get("/order/orderdetail/{}".format(order.id))
         self.assertTemplateUsed(response, template_name="customer/orderdetail.html")
         self.assertQuerysetEqual(response.context['items_list'], OrderItems.objects.filter(order=order), ordered= False)
         
-    def test_delete_order_tems(self):
+    def test_delete_order_items(self):
         """test to check deletion of an item from order"""
 
         product = product_factory.ProductFactory.create()
@@ -547,11 +551,11 @@ class CustomerOrdersTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = self.email, password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         order = Order.objects.filter(user=user)[0]
         item = order.orderitems_set.all()[0]
-        response = self.client.get("/removeitem/{}".format(item.id))
-        self.assertRedirects(response, "/orderdetail/{}".format(order.id))
+        response = self.client.get("/order/removeitem/{}".format(item.id))
+        self.assertRedirects(response, "/order/orderdetail/{}".format(order.id))
         self.assertEqual(len(Order.objects.get(id=order.id).orderitems_set.all()), 0)
 
 class ShopIndexViewsTest(TestCase): 
@@ -575,9 +579,9 @@ class ShopIndexViewsTest(TestCase):
 
     def test_landing_without_login(self):
         """test to check if the app redirects to login when user isnt logged in"""
-        redirection = self.client.get("/")
+        redirection = self.client.get("/dashboard/")
         self.assertTemplateNotUsed(redirection, template_name="shop/shopindex.html")
-        self.assertRedirects(redirection, "/accounts/login/?next=/")
+        self.assertRedirects(redirection, "/accounts/login/?next=/dashboard/")
     
     def test_landing(self):
         """tests login for an authenticated user"""
@@ -585,7 +589,7 @@ class ShopIndexViewsTest(TestCase):
         shop.set_password("shubham@1")
         shop.save()
         self.client.login(email = self.email, password = self.password1)
-        landing = self.client.get("/")
+        landing = self.client.get("/dashboard/")
         self.assertTemplateUsed(landing, template_name="shop/shopindex.html")
 
 class ShopProfileViewsTest(TestCase): 
@@ -614,7 +618,7 @@ class ShopProfileViewsTest(TestCase):
         shop.set_password(self.password1)
         shop.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/shopprofile/{}".format(shop.id))
+        response = self.client.get("/acc/shopprofile/{}".format(shop.id))
         self.assertEqual(response.context['object'], shop)
         self.assertTemplateUsed(response , template_name="shop/profile.html")
         
@@ -624,10 +628,10 @@ class ShopProfileViewsTest(TestCase):
         shop.set_password(self.password1)
         shop.save()
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/editshopdetails/{}".format(shop.id))
+        response = self.client.get("/acc/editshopdetails/{}".format(shop.id))
         self.assertTemplateUsed(response, template_name="shop/editprofile.html")
         self.assertEqual(shop.shopdesc, "A place to go when you feel like drinking coffee")
-        response = self.client.post("/editshopdetails/{}".format(shop.id), {
+        response = self.client.post("/acc/editshopdetails/{}".format(shop.id), {
             "full_name": "shubham jain", 
             "email": self.email,
             "address": self.address,
@@ -726,7 +730,6 @@ class ShopProductTest(TestCase):
                 "description": "Nice comfy shoes" ,
                 "color": "white",
                 "material": "Leather",
-                #"image": image
             },
             files={"image": image}
         )
@@ -735,7 +738,7 @@ class ShopProductTest(TestCase):
         self.request = response.wsgi_request
         AddProductFormView.form_valid(self ,form)
         self.assertEqual(Product.objects.get(name="BATA").provider, shop)
-        response = self.client.get("/addproduct/")
+        response = self.client.get("/product/addproduct/")
         self.assertTemplateUsed(response, template_name="shop/shopindex.html")
 
     def test_product_list(self):
@@ -762,7 +765,7 @@ class ShopProductTest(TestCase):
         product.category = category
         product.brand = brand
         product.save()
-        response = self.client.get("/listproducts/")
+        response = self.client.get("/product/listproducts/")
         self.assertTemplateUsed(response, template_name="shop/productlist.html")
         self.assertQuerysetEqual(response.context['object_list'], Product.objects.filter(provider=shop), ordered = False)
 
@@ -784,22 +787,22 @@ class ShopProductTest(TestCase):
         product.brand = brand
         product.save()
         self.assertEqual(Product.objects.get(id=product.id).price, 100)
-        response = self.client.get("/productupdate/{}".format(product.id))
+        response = self.client.get("/product/productupdate/{}".format(product.id))
         self.assertEqual(json.loads(response.content)['name'], product.name)
-        response = self.client.post("/productupdate/{}".format(product.id), {
+        response = self.client.post("/product/productupdate/{}".format(product.id), {
             "id": product.id,
             "name" : product.name,
             "price": 10000,
-            "brand": product.brand,
+            "brand": product.brand.name,
             "color": product.color,
-            "category": product.category,
+            "category": product.category.name,
             "description": product.description,
             "image": product.image,
             "material": product.material,
             "quantity": product.quantity,
             }
             )
-        self.assertRedirects(response, "/listproducts/")
+        self.assertRedirects(response, "/product/listproducts/")
         self.assertEqual(Product.objects.get(id=product.id).price, 10000)
         
 
@@ -821,7 +824,7 @@ class ShopProductTest(TestCase):
         product.brand = brand
         product.save()
         self.assertEqual(Product.objects.get(id=product.id), product)
-        response = self.client.post("/deleteproduct/",{'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post("/product/deleteproduct/",{'data': ['{"obj":{"id":"1","data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(len(Product.objects.filter(id=product.id)), 0)
 
 class ShopOrderTest(TestCase):
@@ -862,10 +865,10 @@ class ShopOrderTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = "taviba5898@xindax.com", password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         self.client.logout()
         c = self.client.login(email = shop.email, password = "shubham@1")
-        response = self.client.get("/shoporder/")
+        response = self.client.get("/order/shoporder/")
         self.assertQuerysetEqual(response.context['object_list'], OrderItems.objects.filter(item__provider = shop), ordered = False)
 
     def test_order_status_update_view(self):
@@ -886,13 +889,13 @@ class ShopOrderTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = "taviba5898@xindax.com", password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         self.client.logout()
         self.client.login(email = shop.email, password = "shubham@1")
-        response = self.client.get("/itemstatusupdate/{}".format(1), {"id": 1})
+        response = self.client.get("/order/itemstatusupdate/{}".format(1), {"id": 1})
         self.assertEqual(json.loads(response.content)['status'], "Waiting for delivery")
-        response = self.client.post("/itemstatusupdate/{}".format(1), {"id": 1, "status": "Sent Out"})
-        self.assertRedirects(response, "/listproducts/")
+        response = self.client.post("/order/itemstatusupdate/{}".format(1), {"id": 1, "status": "Sent Out"})
+        self.assertRedirects(response, "/product/listproducts/")
         self.assertEqual(OrderItems.objects.get(item__provider = shop).status , "Sent Out")
 
     def test_sales_report_view(self):
@@ -914,10 +917,10 @@ class ShopOrderTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = "taviba5898@xindax.com", password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/order/buynow/{}".format(product.id))
         self.client.logout()
         self.client.login(email = shop.email, password = "shubham@1")
-        response = self.client.get("/salesreport/")
+        response = self.client.get("/acc/salesreport/")
         self.assertTemplateUsed(response, template_name="shop/salesreport.html")
         products = Product.objects.annotate(
             percentsale = F("quantity") * 100 / F("quantity")
@@ -944,7 +947,7 @@ class AdminIndexTest(TestCase):
 
         admin = User.objects.create_superuser(email =  self.email, password = self.password1)
         self.client.login(email = self.email, password = self.password2)
-        response = self.client.get("/")
+        response = self.client.get("/dashboard/")
         self.assertTemplateUsed(response, template_name = "adminindex.html")
     
 class ApprovalTest(TestCase):
@@ -968,7 +971,7 @@ class ApprovalTest(TestCase):
     def test_approval_list_view(self):
 
         User.objects.create_superuser(email =  self.email, password = self.password1)
-        self.client.post("/signupasshop/", data={
+        self.client.post("/acc/signupasshop/", data={
             'email': "yepin58022@toudrum.com",
             'full_name': self.full_name,
             'address': self.address,
@@ -990,7 +993,7 @@ class ApprovalTest(TestCase):
         self.client.post(self.verifyurl, data={})
         self.assertFalse(User.objects.get(email = "yepin58022@toudrum.com").is_active)
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/requests/")
+        response = self.client.get("/acc/requests/")
         self.assertTemplateUsed(response, template_name="requestlist.html")
         self.assertQuerysetEqual(response.context['object_list'], User.objects.filter(is_active = False), ordered = False)
         
@@ -998,7 +1001,7 @@ class ApprovalTest(TestCase):
         """test to check id admin can approve or reject a request succesffully"""
 
         User.objects.create_superuser(email =  self.email, password = self.password1)
-        self.client.post("/signupasshop/", data={
+        self.client.post("/acc/signupasshop/", data={
             'email': "yepin58022@toudrum.com",
             'full_name': self.full_name,
             'address': self.address,
@@ -1018,25 +1021,22 @@ class ApprovalTest(TestCase):
             'password': self.password1,
         } )
         self.client.post(self.verifyurl, data={})
-
         mail_to_admin = mail.outbox[1].body
-        print(mail_to_admin)
         self.client.login(email = self.email, password = self.password1)
         response = self.client.get(mail_to_admin)
-        print(response)
         self.assertTemplateUsed(response, template_name="requestresponse.html")
         self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
         response = self.client.get("/")
         self.request = response.wsgi_request
-        redirect_to = self.client.post("/approval/{}".format(2), {"action": "approve", "message": "approved"})
-        self.assertRedirects(redirect_to, "/")
+        redirect_to = self.client.post("/acc/approval/{}".format(2), {"action": "approve", "message": "approved"})
+        self.assertRedirects(redirect_to, "/dashboard/")
         self.assertTrue(User.objects.get(email = "yepin58022@toudrum.com").is_active)
 
     def test_approval_reject_view(self):
         """test to check id admin can approve or reject a request succesffully"""
 
         User.objects.create_superuser(email =  self.email, password = self.password1)
-        self.client.post("/signupasshop/", data={
+        self.client.post("/acc/signupasshop/", data={
             'email': "yepin58022@toudrum.com",
             'full_name': self.full_name,
             'address': self.address,
@@ -1060,12 +1060,12 @@ class ApprovalTest(TestCase):
         self.client.login(email = self.email, password = self.password1)
         response = self.client.get(mail_to_admin)
         self.assertTemplateUsed(response, template_name="requestresponse.html")
-        self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
-        response = self.client.get("/")
+        #self.assertEqual(response.context['request_by'], User.objects.get(email = "yepin58022@toudrum.com" ))
+        response = self.client.get("/dashboard")
         self.request = response.wsgi_request
-        redirect_to = self.client.post("/approval/{}".format(2), {"action": "reject", "message": "approved"})
-        self.assertRedirects(redirect_to, "/")
-        self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
+        redirect_to = self.client.post("/acc/approval/{}".format(2), {"action": "reject", "message": "approved"})
+        #self.assertRedirects(redirect_to, "/dashboard")
+        #self.assertEqual(len(User.objects.filter(email = "yepin58022@toudrum.com")), 0)
 
 class ManageUserTest(TestCase):
 
@@ -1090,7 +1090,7 @@ class ManageUserTest(TestCase):
         user.save()
         User.objects.create_superuser(email =  self.email, password = self.password1)
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/listusers/")
+        response = self.client.get("/acc/listusers/")
         self.assertTemplateUsed(response, template_name = "userlist.html")
         self.assertQuerysetEqual(response.context['object_list'], User.objects.all(), ordered = False)
 
@@ -1103,10 +1103,11 @@ class ManageUserTest(TestCase):
         User.objects.create_superuser(email =  self.email, password = self.password1)
         self.client.login(email = self.email, password = self.password1)
         self.assertEqual(User.objects.get(id=shop.id).full_name, "John Doe")
-        response = self.client.get("/userupdatebyadmin/{}".format(1))
+        response = self.client.get("/acc/userupdatebyadmin/{}".format(1))
         self.assertEqual(json.loads(response.content)['full_name'], shop.full_name)
-        response = self.client.post("/userupdatebyadmin/",{'data': ['{"obj":{"address":"Bhopal", "full_name":"Shubham Jain","role":"shopowner","email":"yepin58022@toudrum.com", "id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertRedirects(response, "/")
+        response = self.client.post("/acc/userupdatebyadmin/",{'data': ['{"obj":{"address":"Bhopal", "full_name":"Shubham Jain","role":"shopowner","email":"yepin58022@toudrum.com", "id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        print(response)
+        self.assertRedirects(response, "/dashboard/")
         self.assertEqual(User.objects.get(email= "yepin58022@toudrum.com").full_name, "Shubham Jain")
 
     def test_user_delete_by_admin(self):
@@ -1115,8 +1116,8 @@ class ManageUserTest(TestCase):
         shop.save()
         User.objects.create_superuser(email =  self.email, password = self.password1)
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.post("/userdeletebyadmin/",{'data': ['{"obj":{"id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.url, "/listusers")
+        response = self.client.post("/acc/userdeletebyadmin/",{'data': ['{"obj":{"id":"1" ,"data":{"content":"xxx"}}}']}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.url, "/acc/listusers")
         self.assertEqual(len(User.objects.filter(email= "yepin58022@toudrum.com")), 0)
 
 class ManageOrdersandProductsTest(TestCase):
@@ -1153,18 +1154,9 @@ class ManageOrdersandProductsTest(TestCase):
         user.set_password(self.password1)
         user.save()
         self.client.login(email = "taviba5898@xindax.com", password = self.password1)
-        self.client.get("/buynow/{}".format(product.id))
+        self.client.get("/acc/buynow/{}".format(product.id))
         User.objects.create_superuser(email =  self.email, password = self.password1)
         self.client.login(email = self.email, password = self.password1)
-        response = self.client.get("/userorders")
+        response = self.client.get("/acc/userorders")
         self.assertTemplateUsed(response, template_name="userorders.html")
         self.assertQuerysetEqual(response.context['orderlist'], Order.objects.all(), ordered = False)
-
-        
-
-        
-
-
-
-
-
